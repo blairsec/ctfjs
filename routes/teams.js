@@ -2,6 +2,7 @@ var express = require('express')
 var passport = require('passport')
 var User = require('../models/user')
 var Team = require('../models/team')
+var responses = require('../responses')
 var router = express.Router()
 
 // create team
@@ -11,11 +12,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), function (req
       name: req.body.name,
       passcode: req.body.passcode,
       members: [
-        {
-          username: req.user.username,
-          _id: req.user._id,
-          eligible: req.user.eligible
-        }
+        responses.user(req.user)
       ],
       school: (req.body.school ? req.body.school : null)
     })
@@ -43,13 +40,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), function (req
 // view list of teams
 router.get('/', function (req, res) {
   Team.find({}, function(err, teams) {
-    res.json(teams.map(team => ({
-      name: team.name,
-      eligible: team.members.reduce((teamEligible, member) => teamEligible && member.eligible, true),
-      members: team.members,
-      score: team.score,
-      school: team.school
-    })))
+    res.json(teams.map(team => responses.team(team)))
   })
 })
 
@@ -61,15 +52,7 @@ router.get('/self', passport.authenticate('jwt', { session: false }), function (
         console.log(err)
         res.sendStatus(500)
       } else if (team) {
-        res.json({
-          name: team.name,
-          eligible: team.members.reduce((teamEligible, member) => teamEligible && member.eligible, true),
-          members: team.members,
-          score: team.score,
-          school: team.school,
-          _id: team._id,
-          passcode: team.passcode
-        })
+        res.json(responses.team(team, true))
       } else {
         res.sendStatus(404)
       }
@@ -86,13 +69,7 @@ router.get('/:id', function (req, res) {
       console.log(err)
       res.sendStatus(500)
     } else if (team) {
-      res.json({
-        name: team.name,
-        eligible: team.members.reduce((teamEligible, member) => teamEligible && member.eligible, true),
-        members: team.members,
-        score: team.score,
-        school: team.school
-      })
+      res.json(responses.team(team))
     } else {
       res.sendStatus(404)
     }
@@ -106,14 +83,10 @@ router.patch('/', passport.authenticate('jwt', { session: false }), function (re
       console.log(err)
       res.sendStatus(500)
     } else if (team) {
-      if (team.members.filter(member => member._id == req.user._id).length > 0 || req.body.passcode != team.passcode) {
+      if (team.members.filter(member => member.id == req.user._id).length > 0 || req.body.passcode != team.passcode) {
         res.sendStatus(403)
       } else {
-        team.members.push({
-          username: req.user.username,
-          _id: req.user._id,
-          eligible: req.user.eligible
-        })
+        team.members.push(responses.user(req.user))
         team.save(function (err) {
           if (err) {
             console.log(err)

@@ -1,6 +1,7 @@
 var express = require('express')
 var passport = require('passport')
 var User = require('../models/user')
+var responses = require('../responses')
 var router = express.Router()
 
 // register user
@@ -22,12 +23,7 @@ router.post('/', function (req, res) {
 
 // get info about self
 router.get('/self', passport.authenticate('jwt', { session: false }), function (req, res) {
-  res.json({
-    username: req.user.username,
-    _id: req.user._id,
-    eligible: req.user.eligible,
-    team: req.user.team
-  })
+  res.json(responses.user(user))
 })
 
 // get info about user
@@ -37,11 +33,7 @@ router.get('/:user', function (req, res) {
       console.log(err)
       res.sendStatus(500)
     } else if (user) {
-      res.json({
-        username: user.username,
-        eligible: user.eligible,
-        team: user.team
-      })
+      res.json(responses.user(user))
     } else {
       res.sendStatus(404)
     }
@@ -51,12 +43,7 @@ router.get('/:user', function (req, res) {
 // get list of users
 router.get('/', passport.authenticate('jwt', { session: false }), function (req, res) {
   User.find({}, function(err, users) {
-    res.json(users.map(user => ({
-      username: user.username,
-      _id: user._id,
-      eligible: user.eligible,
-      team: user.team
-    })))
+    res.json(users.map(user => (responses.user(user))))
   })
 })
 

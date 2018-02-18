@@ -16,23 +16,12 @@ var usersRouter = require('./routes/users')
 var authRouter = require('./routes/auth')
 var teamsRouter = require('./routes/teams')
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:8080")
-  res.header("Access-Control-Allow-Credentials", true)
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-  res.header("Access-Control-Allow-Methods", "PATCH, GET, POST")
-  next()
-})
-
 app.use(passport.initialize())
 app.use(bodyParser.json())
 app.use(cookieParser())
 app.use('/users', usersRouter)
 app.use('/auth', authRouter)
 app.use('/teams', teamsRouter)
-
-app.listen(3000)
-
 
 // passport config
 var LocalStrategy = require('passport-local').Strategy
@@ -65,3 +54,6 @@ passport.use(new JwtStrategy({
     }
   })
 }))
+
+
+app.listen(3000)
