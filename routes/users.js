@@ -20,6 +20,24 @@ router.post('/', function (req, res) {
   })
 })
 
+// get info about user
+router.get('/:user', function (req, res) {
+  User.findOne({_id: req.params.user}, function (err, user) {
+    if (err) {
+      console.log(err)
+      res.sendStatus(500)
+    } else if (user) {
+      res.json({
+        username: user.username,
+        eligible: user.eligible,
+        team: user.team
+      })
+    } else {
+      res.sendStatus(404)
+    }
+  })
+})
+
 // get list of users
 // requires admin
 router.get('/', passport.authenticate('jwt', { session: false }), function (req, res) {

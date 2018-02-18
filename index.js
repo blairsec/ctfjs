@@ -2,7 +2,7 @@ var config = require('./config')
 
 // db config
 var mongoose = require('mongoose')
-mongoose.connect('mongodb://localhost/ctfjs');
+mongoose.connect('mongodb://localhost/ctfjs')
 
 
 // server config
@@ -13,11 +13,13 @@ var app = express()
 
 var usersRouter = require('./routes/users')
 var authRouter = require('./routes/auth')
+var teamsRouter = require('./routes/teams')
 
 app.use(passport.initialize())
 app.use(bodyParser.json())
 app.use('/users', usersRouter)
 app.use('/auth', authRouter)
+app.use('/teams', teamsRouter)
 
 app.listen(3000)
 

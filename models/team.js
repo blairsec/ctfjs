@@ -3,27 +3,22 @@ var autoIncrement = require('mongoose-plugin-autoinc')
 var passportLocalMongoose = require('passport-local-mongoose')
 
 var schema = new mongoose.Schema({
-  username: {
+  name: {
     type: String,
     required: true,
     unique: true
   },
-  email: {
-    type: String,
-    required: true
-  },
-  eligible: {
-    type: Boolean,
-    required: true
-  },
-  team: Number,
-  admin: Boolean
+  members: [{
+    username: String,
+    _id: Number,
+    eligible: Boolean
+  }]
 }, {
   timestamps: {
     createdAt: 'createdAt'
   }
 })
 
-schema.plugin(autoIncrement.plugin, 'User')
+schema.plugin(autoIncrement.plugin, 'Team')
 schema.plugin(passportLocalMongoose)
-module.exports = mongoose.model('User', schema)
+module.exports = mongoose.model('Team', schema)
