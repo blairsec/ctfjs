@@ -24,6 +24,6 @@ var schema = new mongoose.Schema({
   }
 })
 
-schema.plugin(autoIncrement.plugin, 'User')
+schema.plugin(autoIncrement.plugin, { model: 'User', startAt: 1 })
 schema.plugin(passportLocalMongoose)
 module.exports = mongoose.model('User', schema)
