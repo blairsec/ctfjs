@@ -11,6 +11,10 @@ var schema = new mongoose.Schema({
     type: String,
     required: true
   },
+  eligible: {
+    type: Boolean,
+    required: true
+  },
   admin: Boolean
 }, {
   timestamps: {
