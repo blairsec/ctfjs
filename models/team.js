@@ -8,6 +8,15 @@ var schema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  passcode: {
+    type: String,
+    required: true
+  },
+  score: {
+    type: Number,
+    default: 0
+  },
+  school: String,
   members: [{
     username: String,
     _id: Number,

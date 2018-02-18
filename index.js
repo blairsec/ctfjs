@@ -9,14 +9,24 @@ mongoose.connect('mongodb://localhost/ctfjs')
 var passport = require('passport')
 var express = require('express')
 var bodyParser = require('body-parser')
+var cookieParser = require('cookie-parser')
 var app = express()
 
 var usersRouter = require('./routes/users')
 var authRouter = require('./routes/auth')
 var teamsRouter = require('./routes/teams')
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://localhost:8080")
+  res.header("Access-Control-Allow-Credentials", true)
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+  res.header("Access-Control-Allow-Methods", "PATCH, GET, POST")
+  next()
+})
+
 app.use(passport.initialize())
 app.use(bodyParser.json())
+app.use(cookieParser())
 app.use('/users', usersRouter)
 app.use('/auth', authRouter)
 app.use('/teams', teamsRouter)
@@ -35,7 +45,13 @@ passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
 
 passport.use(new JwtStrategy({
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: function (req) {
+    var token = null
+    if (req && req.cookies) {
+      token = req.cookies.token
+    }
+    return token
+  },
   secretOrKey: config.jwt_secret
 }, function(payload, done) {
   User.findOne({_id: payload.id}, function(err, user) {

@@ -15,8 +15,18 @@ router.post('/', function (req, res) {
       console.log(err)
       res.sendStatus(500)
     } else {
-      res.sendStatus(200)
+      res.sendStatus(201)
     }
+  })
+})
+
+// get info about self
+router.get('/self', passport.authenticate('jwt', { session: false }), function (req, res) {
+  res.json({
+    username: req.user.username,
+    _id: req.user._id,
+    eligible: req.user.eligible,
+    team: req.user.team
   })
 })
 
@@ -39,15 +49,15 @@ router.get('/:user', function (req, res) {
 })
 
 // get list of users
-// requires admin
 router.get('/', passport.authenticate('jwt', { session: false }), function (req, res) {
-  if (req.user.admin) {
-    User.find({}, function(err, users) {
-      res.send(users)
-    })
-  } else {
-    res.sendStatus(403)
-  }
+  User.find({}, function(err, users) {
+    res.json(users.map(user => ({
+      username: user.username,
+      _id: user._id,
+      eligible: user.eligible,
+      team: user.team
+    })))
+  })
 })
 
 module.exports = router
