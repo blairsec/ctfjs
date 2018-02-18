@@ -5,7 +5,7 @@ var router = express.Router()
 
 // register user
 router.post('/', function (req, res) {
-  User.register(new User({ username: req.body.username, email: req.body.password }), req.body.password, function(err, user) {
+  User.register(new User({ username: req.body.username, email: req.body.email }), req.body.password, function(err, user) {
     if (err) {
       // TODO: implement error codes
       console.log(err)
