@@ -12,7 +12,6 @@ router.post('/', function (req, res) {
     eligible: req.body.eligible
   }), req.body.password, function(err, user) {
     if (err) {
-      // TODO: implement error codes
       console.log(err)
       res.sendStatus(500)
     } else {
