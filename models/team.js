@@ -23,7 +23,7 @@ var schema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  school: String,
+  affiliation: String,
   members: [{
     username: String,
     _id: Number,

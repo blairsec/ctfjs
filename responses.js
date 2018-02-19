@@ -13,7 +13,7 @@ function team(teamObject, member) {
     eligible: teamObject.members.reduce((teamEligible, member) => teamEligible && member.eligible, true),
     members: teamObject.members.map(member => user(member)),
     score: teamObject.score,
-    school: teamObject.school,
+    affiliation: teamObject.affiliation,
     id: teamObject._id
   }
   if (member) {

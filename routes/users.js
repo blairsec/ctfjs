@@ -23,7 +23,7 @@ router.post('/', function (req, res) {
 
 // get info about self
 router.get('/self', passport.authenticate('jwt', { session: false }), function (req, res) {
-  res.json(responses.user(user))
+  res.json(responses.user(req.user))
 })
 
 // get info about user

@@ -15,7 +15,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), function (req
       members: [
         responses.user(req.user)
       ],
-      school: (req.body.school ? req.body.school : null)
+      affiliation: (req.body.affiliation ? req.body.affiliation : null)
     })
     team.save(function (err) {
       if (err) {
