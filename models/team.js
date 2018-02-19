@@ -1,11 +1,11 @@
 var mongoose = require('mongoose')
 var autoIncrement = require('mongoose-plugin-autoinc')
-var passportLocalMongoose = require('passport-local-mongoose')
 
 var schema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    index: true,
     unique: true
   },
   passcode: {
