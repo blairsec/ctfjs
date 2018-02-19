@@ -5,8 +5,15 @@ var schema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    trim: true
+  },
+  nameLower: {
+    type: String,
+    required: true,
     index: true,
-    unique: true
+    unique: true,
+    lowercase: true,
+    trim: true
   },
   passcode: {
     type: String,

@@ -10,6 +10,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), function (req
   if (!req.user.team) {
     var team = new Team({
       name: req.body.name,
+      nameLower: req.body.name.toLowerCase(),
       passcode: req.body.passcode,
       members: [
         responses.user(req.user)
@@ -78,7 +79,7 @@ router.get('/:id', function (req, res) {
 
 // join team
 router.patch('/', passport.authenticate('jwt', { session: false }), function (req, res) {
-  Team.findOne({name: req.body.name}, function (err, team) {
+  Team.findOne({nameLower: req.body.name.toLowerCase()}, function (err, team) {
     if (err) {
       console.log(err)
       res.sendStatus(500)

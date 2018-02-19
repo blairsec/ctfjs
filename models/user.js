@@ -6,13 +6,23 @@ var schema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true
+    trim: true
+  },
+  usernameLower: {
+    type: String,
+    required: true,
+    index: true,
+    unique: true,
+    lowercase: true,
+    trim: true
   },
   email: {
     type: String,
     required: true,
+    index: true,
+    unique: true,
     lowercase: true,
-    unique: true
+    trim: true
   },
   eligible: {
     type: Boolean,
@@ -27,5 +37,5 @@ var schema = new mongoose.Schema({
 })
 
 schema.plugin(autoIncrement.plugin, { model: 'User', startAt: 1 })
-schema.plugin(passportLocalMongoose)
+schema.plugin(passportLocalMongoose, { usernameCaseInsensitive: true })
 module.exports = mongoose.model('User', schema)
