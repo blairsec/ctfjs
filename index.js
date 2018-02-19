@@ -15,6 +15,7 @@ var app = express()
 var usersRouter = require('./routes/users')
 var authRouter = require('./routes/auth')
 var teamsRouter = require('./routes/teams')
+var challengesRouter = require('./routes/challenges')
 
 app.use(passport.initialize())
 app.use(bodyParser.json())
@@ -22,6 +23,7 @@ app.use(cookieParser())
 app.use('/users', usersRouter)
 app.use('/auth', authRouter)
 app.use('/teams', teamsRouter)
+app.use('/challenges', challengesRouter)
 
 // passport config
 var LocalStrategy = require('passport-local').Strategy

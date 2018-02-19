@@ -22,7 +22,37 @@ function team(teamObject, member) {
   return response
 }
 
+function solve(solveObject) {
+  var response = {
+    team: {
+      id: solveObject.team._id,
+      name: solveObject.team.name
+    },
+    user: {
+      id: solveObject.user._id,
+      username: solveObject.user.username
+    },
+    time: solveObject.time
+  }
+  return response
+}
+
+function challenge(challengeObject) {
+  var response = {
+    id: challengeObject._id,
+    title: challengeObject.title,
+    description: challengeObject.description,
+    value: challengeObject.value,
+    author: challengeObject.author,
+    category: challengeObject.category,
+    solves: challengeObject.solves.map(solveObject => solve(solveObject))
+  }
+  return response
+}
+
 module.exports = {
   user,
-  team
+  team,
+  solve,
+  challenge
 }
