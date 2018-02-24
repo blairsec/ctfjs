@@ -9,7 +9,7 @@ var router = express.Router()
 // give jwt
 router.post('/', passport.authenticate('local'), function (req, res) {
   var token = jwt.sign({id: req.user._id}, config.jwt_secret)
-  res.cookie('token', token).sendStatus(200)
+  res.cookie('token', token).json({ token: token })
 })
 
 module.exports = router

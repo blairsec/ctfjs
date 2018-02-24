@@ -23,6 +23,11 @@ var schema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  solves: [{
+    challenge: Number,
+    time: Date,
+    user: Number
+  }],
   affiliation: String,
   members: [{
     username: String,

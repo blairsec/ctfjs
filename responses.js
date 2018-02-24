@@ -37,7 +37,7 @@ function solve(solveObject) {
   return response
 }
 
-function challenge(challengeObject) {
+function challenge(challengeObject, solved) {
   var response = {
     id: challengeObject._id,
     title: challengeObject.title,
@@ -45,7 +45,8 @@ function challenge(challengeObject) {
     value: challengeObject.value,
     author: challengeObject.author,
     category: challengeObject.category,
-    solves: challengeObject.solves.map(solveObject => solve(solveObject))
+    solves: challengeObject.solves.map(solveObject => solve(solveObject)),
+    solved: solved === true ? true : false
   }
   return response
 }
