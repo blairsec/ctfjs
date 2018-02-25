@@ -14,7 +14,9 @@ function team(teamObject, member) {
     members: teamObject.members.map(member => user(member)),
     score: teamObject.score,
     affiliation: teamObject.affiliation,
-    id: teamObject._id
+    id: teamObject._id,
+    created: teamObject.createdAt,
+    solves: teamObject.solves
   }
   if (member) {
     response.passcode = teamObject.passcode
