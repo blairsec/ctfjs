@@ -3,6 +3,7 @@
 var program = require('commander')
 var pm2 = require('pm2')
 var crypto = require('crypto')
+var path = require('path')
 
 var config = {
   jwt_secret: crypto.randomBytes(64).toString('hex'),
@@ -11,7 +12,7 @@ var config = {
 }
 
 function start (callback) {
-  pm2.start('ctf.js', { env: { PORT: config.port, DATABASE_URI: config.db_uri, SECRET_KEY: config.jwt_secret } }, function (err, proc) {
+  pm2.start(path.join(__dirname, 'ctf.js'), { env: { PORT: config.port, DATABASE_URI: config.db_uri, SECRET_KEY: config.jwt_secret } }, function (err, proc) {
     if (err && err.message === 'Script already launched') console.log('Error: ctfjs already running')
     else if (err) throw err
     pm2.disconnect(callback)
