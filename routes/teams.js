@@ -5,110 +5,90 @@ var Team = require('../models/team')
 var responses = require('../responses')
 var router = express.Router()
 
-// create team
-router.post('/', passport.authenticate('jwt', { session: false }), function (req, res) {
-  if (!req.user.team) {
+var { check, validationResult } = require('express-validator/check')
+
+// create + join team
+router.post('/', [
+  check('name').exists(),
+  check('passcode').exists()
+], passport.authenticate('jwt', { session: false }), async (req, res) => {
+  // check if data was valid
+  var errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).json({message: 'invalid_values'})
+  }
+  var user = req.user
+  if (!user.team) {
     var team = new Team({
       name: req.body.name,
       nameLower: req.body.name.toLowerCase(),
       passcode: req.body.passcode,
-      members: [
-        responses.user(req.user)
-      ],
       affiliation: (req.body.affiliation ? req.body.affiliation : null)
     })
-    team.save(function (err) {
-      if (err) {
+    try {
+      var team = await team.save()
+      req.user.team = team._id
+      try {
+        var user = await req.user.save()
+        res.sendStatus(201)
+      } catch (err) {
         console.log(err)
         res.sendStatus(500)
-      } else {
-        req.user.team = team._id
-        req.user.save(function (err) {
-          if (err) {
-            console.log(err)
-            res.sendStatus(500)
-          } else {
-            res.sendStatus(201)
-          }
-        })
       }
-    })
+    } catch (err) {
+      console.log(err)
+      res.status(409).json({message: 'team_already_exists'})
+    }
   } else {
-    res.sendStatus(403)
+    res.status(403).json({message: 'user_already_has_team'})
   }
 })
 
-// view list of teams
-router.get('/', function (req, res) {
-  Team.find({}, function(err, teams) {
-    res.json(teams.map(team => responses.team(team)))
-  })
+// get list of teams
+router.get('/', async (req, res, next) => {
+  var teams = await Team.find({}).populate('members').populate({ path: 'submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }).exec()
+  res.json(teams.map(team => responses.team(team)))
 })
 
-// view own team
-router.get('/self', passport.authenticate('jwt', { session: false }), function (req, res) {
-  if (req.user.team) {
-    Team.findOne({_id: req.user.team}, function (err, team) {
-      if (err) {
-        console.log(err)
-        res.sendStatus(500)
-      } else if (team) {
-        res.json(responses.team(team, true))
-      } else {
-        res.sendStatus(404)
+// get a team
+router.get('/:team', async (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, async function (err, user) {
+    try {
+      if (req.params.team !== 'self') team = await Team.findOne({ _id: req.params.team }).populate('members').populate({ path: 'submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }).exec()
+      else {
+        if (user === false) return res.sendStatus(401)
+        team = await Team.findOne({ _id: user.team }).populate('members').populate({ path: 'submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }).exec()
       }
-    })
+      if (team) res.json(responses.team(team, user.team._id === team._id))
+      else throw "team_not_found"
+    } catch (err) {
+      console.log(err)
+      res.status(404).json({message: 'team_not_found'})
+    }
+  })(req, res, next)
+})
+
+// modify a team
+router.patch('/:team', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  if (req.params.team === 'self') req.params.team = req.user.team
+  req.params.team = parseInt(req.params.team)
+  if (req.user.admin === true || req.user.team._id === req.params.team) {
+    var team = await Team.findOne({_id: req.params.team}).populate('members').populate('submissions').exec()
+    if (team) {
+      if (req.body.name) team.name = req.body.name
+      if (req.body.affiliation) team.affiliation = req.body.affiliation
+      try {
+        await team.save()
+        res.sendStatus(204)
+      } catch (err) {
+        res.status(409).json({message: 'team_name_conflict'})
+      }
+    } else {
+      res.status(404).json({message: 'team_not_found'})
+    }
   } else {
-    res.sendStatus(404)
+    res.status(403).json({message: 'action_forbidden'})
   }
-})
-
-// view team
-router.get('/:id', function (req, res) {
-  Team.findOne({_id: req.params.id}, function (err, team) {
-    if (err) {
-      console.log(err)
-      res.sendStatus(500)
-    } else if (team) {
-      res.json(responses.team(team))
-    } else {
-      res.sendStatus(404)
-    }
-  })
-})
-
-// join team
-router.patch('/', passport.authenticate('jwt', { session: false }), function (req, res) {
-  Team.findOne({nameLower: req.body.name.toLowerCase()}, function (err, team) {
-    if (err) {
-      console.log(err)
-      res.sendStatus(500)
-    } else if (team) {
-      if (team.members.filter(member => member.id == req.user._id).length > 0 || req.body.passcode != team.passcode) {
-        res.sendStatus(403)
-      } else {
-        team.members.push(responses.user(req.user))
-        team.save(function (err) {
-          if (err) {
-            console.log(err)
-            res.sendStatus(500)
-          } else {
-            req.user.team = team._id
-            req.user.save(function (err) {
-              if (err) {
-                console.log(err)
-                res.sendStatus(500)
-              } else {
-                res.sendStatus(201)
-              }
-            })
-          }
-        })
-      }
-    } else {
-      res.sendStatus(404)
-    }
-  })
 })
 
 module.exports = router

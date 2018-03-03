@@ -1,50 +1,79 @@
 var express = require('express')
 var passport = require('passport')
 var User = require('../models/user')
+var Team = require('../models/team')
 var responses = require('../responses')
 var router = express.Router()
 
-// register user
-router.post('/', function (req, res) {
+var { check, validationResult } = require('express-validator/check')
+
+// register a user
+router.post('/', [
+  check('username').exists(),
+  check('password').isLength({ min: 8 }),
+  check('email').isEmail(),
+  check('eligible').isBoolean()
+], async (req, res) => {
+  // check if data was valid
+  var errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).json({message: 'invalid_values'})
+  }
   User.register(new User({
     username: req.body.username,
-    usernameLower: req.body.username.toLowerCase(),
     email: req.body.email,
     eligible: req.body.eligible
-  }), req.body.password, function(err, user) {
+  }), req.body.password, (err, user) => {
     if (err) {
-      console.log(err)
-      res.sendStatus(500)
+      res.status(409).json({message: 'username_email_conflict'})
     } else {
       res.sendStatus(201)
     }
   })
 })
 
-// get info about self
-router.get('/self', passport.authenticate('jwt', { session: false }), function (req, res) {
-  res.json(responses.user(req.user))
+// get a list of users
+router.get('/', async (req, res) => {
+  var users = await User.find({}).populate({ path: 'team', populate: { path: 'members submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }, model: Team }).populate('submissions').exec()
+  res.json(users.map(user => responses.user(user)))
 })
 
-// get info about user
-router.get('/:user', function (req, res) {
-  User.findOne({_id: req.params.user}, function (err, user) {
-    if (err) {
+// get info about a user
+router.get('/:user', async (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, async function (err, user) {
+    try {
+      if (req.params.user !== 'self') user = await User.findOne({ _id: req.params.user }).populate({ path: 'team', populate: { path: 'members submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }, model: Team }).populate('submissions').exec()
+      if (user) res.json(responses.user(user))
+      else throw "user_not_found"
+    } catch (err) {
       console.log(err)
-      res.sendStatus(500)
-    } else if (user) {
-      res.json(responses.user(user))
-    } else {
-      res.sendStatus(404)
+      res.status(404).json({message: 'user_not_found'})
     }
-  })
+  })(req, res, next)
 })
 
-// get list of users
-router.get('/', passport.authenticate('jwt', { session: false }), function (req, res) {
-  User.find({}, function(err, users) {
-    res.json(users.map(user => (responses.user(user))))
-  })
+// modify a user
+router.patch('/:user', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  if (req.params.user === 'self') req.params.user = req.user._id
+  req.params.user = parseInt(req.params.user)
+  if (req.user.admin === true || req.user._id === req.params.user) {
+    var user = await User.findOne({_id: req.params.user})
+    if (user) {
+      if (req.body.username) user.username = req.body.username
+      if (req.body.email) user.email = req.body.email
+      if (req.body.eligible) user.eligible = req.body.eligible
+      try {
+        await user.save()
+        res.sendStatus(204)
+      } catch (err) {
+        res.status(409).json({message: 'username_email_conflict'})
+      }
+    } else {
+      req.status(400).json({message: 'user_not_found'})
+    }
+  } else {
+    res.status(403).json({message: 'action_forbidden'})
+  }
 })
 
 module.exports = router

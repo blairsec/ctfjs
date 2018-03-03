@@ -1,45 +1,4 @@
-function user(userObject) {
-  return {
-    username: userObject.username,
-    id: userObject._id,
-    eligible: userObject.eligible,
-    team: userObject.team
-  }
-}
-
-function team(teamObject, member) {
-  var response = {
-    name: teamObject.name,
-    eligible: teamObject.members.reduce((teamEligible, member) => teamEligible && member.eligible, true),
-    members: teamObject.members.map(member => user(member)),
-    score: teamObject.score,
-    affiliation: teamObject.affiliation,
-    id: teamObject._id,
-    created: teamObject.createdAt,
-    solves: teamObject.solves
-  }
-  if (member) {
-    response.passcode = teamObject.passcode
-  }
-  return response
-}
-
-function solve(solveObject) {
-  var response = {
-    team: {
-      id: solveObject.team._id,
-      name: solveObject.team.name
-    },
-    user: {
-      id: solveObject.user._id,
-      username: solveObject.user.username
-    },
-    time: solveObject.time
-  }
-  return response
-}
-
-function challenge(challengeObject, solved) {
+function challenge(challengeObject, admin) {
   var response = {
     id: challengeObject._id,
     title: challengeObject.title,
@@ -47,15 +6,48 @@ function challenge(challengeObject, solved) {
     value: challengeObject.value,
     author: challengeObject.author,
     category: challengeObject.category,
-    solves: challengeObject.solves.map(solveObject => solve(solveObject)),
-    solved: solved === true ? true : false
+    solved: challengeObject.solved
   }
+  if (admin) response.flag = challengeObject.flag
   return response
 }
 
-module.exports = {
-  user,
-  team,
-  solve,
-  challenge
+function submission(solveObject, admin) {
+  var response = {
+    time: solveObject.createdAt
+  }
+  if (solveObject.team && typeof solveObject.team === "object") response.team = team(solveObject.team)
+  if (solveObject.user && typeof solveObject.user === "object") response.user = user(solveObject.user)
+  if (solveObject.challenge && typeof solveObject.challenge === "object") response.challenge = challenge(solveObject.challenge)
+  if (admin) response.content = solveObject.content
+  return response
 }
+
+function team(teamObject, self) {
+  var response = {
+    id: teamObject._id,
+    name: teamObject.name,
+    members: teamObject.members.map(member => user(member)),
+    eligible: teamObject.members.reduce((teamEligible, member) => teamEligible && member.eligible, true),
+    affiliation: teamObject.affiliation,
+    created: teamObject.createdAt,
+    score: teamObject.score,
+    solves: teamObject.solves.map(solveObject => submission(solveObject))
+  }
+  if (self === true) response.passcode = teamObject.passcode
+  return response
+}
+
+function user(userObject) {
+  var response = {
+    id: userObject._id,
+    username: userObject.username,
+    eligible: userObject.eligible,
+    school: userObject.school,
+    created: userObject.createdAt
+  }
+  if (userObject.team && typeof userObject.team === "object") response['team'] = team(userObject.team)
+  return response
+}
+
+module.exports = { user, team, submission, challenge }

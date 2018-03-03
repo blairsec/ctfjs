@@ -25,29 +25,25 @@ var schema = new mongoose.Schema({
   category: {
     type: String,
     required: true
-  },
-  submissions: [{
-    team: Number,
-    user: Number,
-    flag: String,
-    time: Date
-  }],
-  solves: [{
-    team: {
-      _id: Number,
-      name: String
-    },
-    time: Date,
-    user: {
-      _id: Number,
-      username: String
-    }
-  }]
+  }
 }, {
-  timestamps: {
-    createdAt: 'createdAt'
+  timestamps: true,
+  toObject: {
+    virtuals: true
+  },
+  toJSON: {
+    virtuals: true
   }
 })
-
 schema.plugin(autoIncrement.plugin, { model: 'Challenge', startAt: 1 })
+
+schema.virtual('submissions', {
+  ref: 'Submission',
+  localField: '_id',
+  foreignField: 'challenge'
+})
+schema.virtual('solved').get(function () {
+  return this.submissions.filter(submission => submission.content === this.flag).length > 0
+})
+
 module.exports = mongoose.model('Challenge', schema)

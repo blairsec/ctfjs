@@ -1,6 +1,10 @@
 var config = require('./config')
 
 // db config
+var User = require('./models/user')
+var Team = require('./models/team')
+var Submission = require('./models/submission')
+
 var mongoose = require('mongoose')
 mongoose.connect('mongodb://localhost/ctfjs')
 
@@ -20,15 +24,15 @@ var challengesRouter = require('./routes/challenges')
 app.use(passport.initialize())
 app.use(bodyParser.json())
 app.use(cookieParser())
-app.use('/users', usersRouter)
 app.use('/auth', authRouter)
+app.use('/users', usersRouter)
 app.use('/teams', teamsRouter)
 app.use('/challenges', challengesRouter)
+
 
 // passport config
 var LocalStrategy = require('passport-local').Strategy
 var JwtStrategy = require('passport-jwt').Strategy
-var ExtractJwt = require('passport-jwt').ExtractJwt
 var User = require('./models/user')
 
 passport.use(new LocalStrategy(User.authenticate()))
@@ -45,7 +49,7 @@ passport.use(new JwtStrategy({
   },
   secretOrKey: config.jwt_secret
 }, function(payload, done) {
-  User.findOne({_id: payload.id}, function(err, user) {
+  User.findOne({_id: payload.id}).populate({ path: 'team', populate: { path: 'members submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }, model: Team }).populate('submissions').exec(function(err, user) {
     if (err) {
       return done(err, false)
     }

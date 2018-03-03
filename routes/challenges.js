@@ -4,54 +4,40 @@ var User = require('../models/user')
 var Team = require('../models/team')
 var Challenge = require('../models/challenge')
 var responses = require('../responses')
-var crypto = require('crypto')
+var Submission = require('../models/submission')
 var router = express.Router()
 
-// get list of challenges
-router.get('/', passport.authenticate('jwt', { session: false }), function (req, res) {
-  if (req.user.team) {
-    Team.findOne({_id: req.user.team}, function (err, team) {
-      Challenge.find({}, function (err, challenges) {
-        res.json(challenges.map(challenge => responses.challenge(challenge, team.solves.map(solve => solve.challenge).indexOf(challenge._id) !== -1)))
-      })
-    })
-  }
+// get a list of challenge
+router.get('/', async (req, res) => {
+  var challenges = await Challenge.find({}).populate({ path: 'submissions', populate: { path: 'user team' } }).exec()
+  res.json(challenges.map(challenge => responses.challenge(challenge)))
 })
 
 // submit flag
-router.post('/:id/submissions', passport.authenticate('jwt', { session: false }), function (req, res) {
+router.post('/:id/submissions', passport.authenticate('jwt', { session: false }), async (req, res) => {
   if (req.user.team) {
-    Challenge.findOne({_id: req.params.id}, function (err, challenge) {
-      if (err) {
-        res.sendStatus(404)
-      } else {
-        Team.findOne({_id: req.user.team}, function (err, team) {
-          if (team.solves.map(solve => solve.challenge).indexOf(challenge._id) === -1) {
-            challenge.submissions.push({
-              team: req.user.team,
-              user: req.user._id,
-              flag: req.body.flag,
-              time: new Date
-            })
-            if (crypto.createHash('sha512').update(req.body.flag).digest('hex') === challenge.flag) {
-              res.json({correct: true})
-              team.solves.push({
-                user: req.user._id,
-                challenge: challenge._id,
-                time: new Date
-              })
-              team.score += challenge.value
-              team.save()
-            } else {
-              res.json({correct: false})
-            }
-            challenge.save()
-          } else {
-            res.sendStatus(400)
-          }
+    try {
+      var challenge = await Challenge.findOne({_id: req.params.id}).populate('submissions').exec()
+      var team = await Team.findOne({_id: req.user.team}).populate('members').populate({ path: 'submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }).exec()
+      if (team.solves.map(solve => solve.challenge._id).indexOf(challenge._id) === -1) {
+        var submission = new Submission({
+          team: team._id,
+          user: req.user._id,
+          challenge: challenge._id,
+          content: req.body.flag
         })
+        await submission.save()
+        submission = await Submission.findOne({ _id: submission._id }).populate('challenge').exec()
+        res.json({ correct: submission.correct })
+      } else {
+        res.status(400).json({ message: 'challenge_already_solved' })
       }
-    })
+    } catch (err) {
+      console.log(err)
+      res.status(404).json({ message: 'challenge_not_found' })
+    }
+  } else {
+    res.status(403).json({message: 'user_not_on_team'})
   }
 })
 
