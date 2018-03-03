@@ -23,7 +23,7 @@ Gets a list of users.
 ### Responses
 |code|description    |content|
 |----|---------------|-------|
-|200 |a list of users|array of [users](index.md#User)|
+|200 |a list of users|array of [users](index.md#user)|
 
 ## Get a user
 Gets a single user.
@@ -32,7 +32,7 @@ Note: `id` can be `self` to get the currently authenticated user
 ### Responses
 |code|description    |content|
 |----|---------------|-------|
-|200 |successfully found user|a [user](index.md#User)|
+|200 |successfully found user|a [user](index.md#user)|
 |404 |user not found|`{"message": "user_not_found"}`|
 
 ## Modify a user :lock:

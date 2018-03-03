@@ -31,7 +31,7 @@ No authentication:
 |username|string|username|
 |eligible|boolean|eligibility|
 |created|string|ISO timestamp of user creation|
-|team|[team](#Team)|user's team (if they have one)|
+|team|[team](#team)|user's team (if they have one)|
 
 ### Team
 No authentication:
@@ -40,12 +40,12 @@ No authentication:
 |----|----|-----------|
 |id|number|team id|
 |name|string|team name|
-|members|array of [users](#User)|a list of the team's members|
+|members|array of [users](#user)|a list of the team's members|
 |eligible|boolean|whether all members on the team are eligible|
 |affiliation|string|team affiliation (can be blank)|
 |created|string|ISO timestamp of team creation|
 |score|number|team's current score|
-|solves|array of [submissions](#Submission)|a list of correct submissions|
+|solves|array of [submissions](#submission)|a list of correct submissions|
 
 Current user's own team (only returned in `/teams/{id}`):
 
@@ -59,9 +59,9 @@ Note: team, user, and challenge are not returned if the parent is of the same ty
 |name|type|description|
 |----|----|-----------|
 |time|string|ISO timestamp of submission time|
-|team|[team](#Team)|team that submitted|
-|user|[user](#User)|user that submitted|
-|challenge|[challenge](#Challenge)|challenge that submission is for|
+|team|[team](#team)|team that submitted|
+|user|[user](#user)|user that submitted|
+|challenge|[challenge](#challenge)|challenge that submission is for|
 
 ### Challenge
 

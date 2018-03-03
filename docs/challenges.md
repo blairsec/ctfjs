@@ -6,7 +6,7 @@ Gets a list of challenges.
 ### Responses
 |code|description    |content|
 |----|---------------|-------|
-|200|a list of challenges|array of [challenges](index.md#Challenge)|
+|200|a list of challenges|array of [challenges](index.md#challenge)|
 
 ## Submit a flag :lock:
 Submits a flag for a challenge. Requires the user to be on a team.

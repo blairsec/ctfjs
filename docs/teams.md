@@ -24,7 +24,7 @@ Gets a list of teams.
 ### Responses
 |code|description|content|
 |----|-----------|-------|
-|200|a list of teams|array of [teams](index.md#Team)|
+|200|a list of teams|array of [teams](index.md#team)|
 
 ## Get a team
 Gets a single team.
@@ -33,7 +33,7 @@ Note: `id` can be `self` to get the current user's team
 ### Responses
 |code|description|content|
 |----|-----------|-------|
-|200|a list of teams|array of [teams](index.md#Team)|
+|200|a list of teams|array of [teams](index.md#team)|
 |401|user requested self, but isn't authenticated|none|
 |404|team not found|`{"message": "team_not_found"}`|
 
