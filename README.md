@@ -1,4 +1,6 @@
 # ctfjs
+[![npm version](https://badge.fury.io/js/ctfjs.svg)](https://badge.fury.io/js/ctfjs)
+
 ctfjs is a CTF (capture the flag) competition backend written in Node.js.
 
 It is still in development, and is not ready to be used to host an actual CTF yet.
