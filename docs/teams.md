@@ -4,16 +4,16 @@
 Creates and joins a team.
 ### `POST /teams`
 ### Request Body
-|name    |type   |required|requirements|
-|--------|-------|--------|------------|
+|name|type|required|requirements|
+|----|----|--------|------------|
 |name|string|yes|none|
 |affiliation|string|no|none|
 |passcode|string|yes|none|
 ### Responses
-|code|description           |content|
-|----|----------------------|-------|
+|code|description|content|
+|----|-----------|-------|
 |400|data validation failed|`{"message": "invalid_values"}`|
-|201|successfuly created team|none|
+|201|successfully created team|none|
 |409|team name conflict|`{"message": "team_already_exists"}`|
 |403|user already on team|`{"message": "user_already_has_team"}`|
 |401|authentication failed|none|
@@ -41,8 +41,8 @@ Note: `id` can be `self` to get the current user's team
 Joins a team.
 ### `PATCH /teams`
 ### Request body
-|name    |type   |required|requirements|
-|--------|-------|--------|------------|
+|name|type|required|requirements|
+|----|----|--------|------------|
 |name|string|yes|none|
 |passcode|string|yes|none|
 ### Responses
@@ -60,8 +60,8 @@ Note: `id` can be `self` to modify the current user's team.
 
 User must either be an admin or modifying their own team.
 ### Request Body
-|name    |type   |required|requirements|
-|--------|-------|--------|------------|
+|name|type|required|requirements|
+|----|----|--------|------------|
 |name|string|no|none|
 |affiliation|string|no|none|
 ### Responses
