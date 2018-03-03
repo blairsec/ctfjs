@@ -43,7 +43,6 @@ function user(userObject) {
     id: userObject._id,
     username: userObject.username,
     eligible: userObject.eligible,
-    school: userObject.school,
     created: userObject.createdAt
   }
   if (userObject.team && typeof userObject.team === "object") response['team'] = team(userObject.team)

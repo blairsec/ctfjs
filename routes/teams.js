@@ -68,6 +68,23 @@ router.get('/:team', async (req, res, next) => {
   })(req, res, next)
 })
 
+// join a team
+router.patch('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  var team = await Team.findOne({ nameLower: req.body.name.toLowerCase() }).populate('members').exec()
+  if (team) {
+    if (team.members.filter(member => member.id == req.user._id).length > 0) {
+      return res.status(403).json({message: "already_in_team"})
+    }
+    if (req.body.passcode != team.passcode) {
+      return res.status(403).json({message: "incorrect_passcode"})
+    }
+    var user = await User.findOne({ _id: req.user._id })
+    user.team = team._id
+    await user.save()
+    res.sendStatus(204)
+  }
+})
+
 // modify a team
 router.patch('/:team', passport.authenticate('jwt', { session: false }), async (req, res) => {
   if (req.params.team === 'self') req.params.team = req.user.team

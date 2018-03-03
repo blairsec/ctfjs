@@ -7,7 +7,7 @@ var responses = require('../responses')
 var Submission = require('../models/submission')
 var router = express.Router()
 
-// get a list of challenge
+// get a list of challenges
 router.get('/', async (req, res) => {
   var challenges = await Challenge.find({}).populate({ path: 'submissions', populate: { path: 'user team' } }).exec()
   res.json(challenges.map(challenge => responses.challenge(challenge)))

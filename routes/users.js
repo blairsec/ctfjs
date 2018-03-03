@@ -59,8 +59,11 @@ router.patch('/:user', passport.authenticate('jwt', { session: false }), async (
   if (req.user.admin === true || req.user._id === req.params.user) {
     var user = await User.findOne({_id: req.params.user})
     if (user) {
+      if (req.body.email) {
+        if (/\S+@\S+\.\S+/.test(req.body.email)) user.email = req.body.email
+        else res.status(400).json({message: 'invalid_values'})
+      }
       if (req.body.username) user.username = req.body.username
-      if (req.body.email) user.email = req.body.email
       if (req.body.eligible) user.eligible = req.body.eligible
       try {
         await user.save()
@@ -69,7 +72,7 @@ router.patch('/:user', passport.authenticate('jwt', { session: false }), async (
         res.status(409).json({message: 'username_email_conflict'})
       }
     } else {
-      req.status(400).json({message: 'user_not_found'})
+      req.status(404).json({message: 'user_not_found'})
     }
   } else {
     res.status(403).json({message: 'action_forbidden'})
