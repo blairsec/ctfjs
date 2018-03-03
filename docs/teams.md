@@ -4,12 +4,14 @@
 Creates and joins a team.
 ### `POST /teams`
 ### Request Body
+
 |name|type|required|requirements|
 |----|----|--------|------------|
 |name|string|yes|none|
 |affiliation|string|no|none|
 |passcode|string|yes|none|
 ### Responses
+
 |code|description|content|
 |----|-----------|-------|
 |400|data validation failed|`{"message": "invalid_values"}`|
@@ -22,6 +24,7 @@ Creates and joins a team.
 Gets a list of teams.
 ### `GET /teams`
 ### Responses
+
 |code|description|content|
 |----|-----------|-------|
 |200|a list of teams|array of [teams](index.md#team)|
@@ -31,6 +34,7 @@ Gets a single team.
 ### `GET /teams/{id}`
 Note: `id` can be `self` to get the current user's team
 ### Responses
+
 |code|description|content|
 |----|-----------|-------|
 |200|a list of teams|array of [teams](index.md#team)|
@@ -41,11 +45,13 @@ Note: `id` can be `self` to get the current user's team
 Joins a team.
 ### `PATCH /teams`
 ### Request body
+
 |name|type|required|requirements|
 |----|----|--------|------------|
 |name|string|yes|none|
 |passcode|string|yes|none|
 ### Responses
+
 |code|description|content|
 |----|-----------|-------|
 |403|user already in team|`{"message": "already_in_team"}`|
@@ -60,11 +66,13 @@ Note: `id` can be `self` to modify the current user's team.
 
 User must either be an admin or modifying their own team.
 ### Request Body
+
 |name|type|required|requirements|
 |----|----|--------|------------|
 |name|string|no|none|
 |affiliation|string|no|none|
 ### Responses
+
 |code|description|content|
 |----|-----------|-------|
 |204|successfully modified team|none|

@@ -4,6 +4,7 @@
 Gets a list of challenges.
 ### `GET /challenges`
 ### Responses
+
 |code|description|content|
 |----|-----------|-------|
 |200|a list of challenges|array of [challenges](index.md#challenge)|
@@ -12,10 +13,12 @@ Gets a list of challenges.
 Submits a flag for a challenge. Requires the user to be on a team.
 ### `POST /challenges/{id}/submissions`
 ### Request Body
+
 |name|type|required|requirements|
 |----|----|--------|------------|
 |flag|string|yes|none|
 ### Responses
+
 |code|description|content|
 |----|-----------|-------|
 |200|submission result|`{"correct": true/false}`|

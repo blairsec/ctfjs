@@ -4,6 +4,7 @@
 Creates a new user.
 ### `POST /users`
 ### Request Body
+
 |name|type|required|requirements|
 |----|----|--------|------------|
 |username|string |yes|none|
@@ -11,6 +12,7 @@ Creates a new user.
 |email|string|yes|_something_@_something_._something_|
 |eligible|boolean|yes|none|
 ### Responses
+
 |code|description|content|
 |----|-----------|-------|
 |400 |data validation failed|`{"message": "invalid_values"}`|
@@ -21,6 +23,7 @@ Creates a new user.
 Gets a list of users.
 ### `GET /users`
 ### Responses
+
 |code|description|content|
 |----|-----------|-------|
 |200|a list of users|array of [users](index.md#user)|
@@ -30,6 +33,7 @@ Gets a single user.
 ### `GET /users/{id}`
 Note: `id` can be `self` to get the currently authenticated user
 ### Responses
+
 |code|description|content|
 |----|-----------|-------|
 |200|successfully found user|a [user](index.md#user)|
@@ -42,6 +46,7 @@ Note: `id` can be `self` to modify the currently authenticated user.
 
 The user must be either an admin or the user they are trying to modify.
 ### Request Body
+
 |name|type|required|requirements|
 |----|----|--------|------------|
 |username|string |no|none|
@@ -49,6 +54,7 @@ The user must be either an admin or the user they are trying to modify.
 |eligible|boolean|no|none|
 
 ### Responses
+
 |code|description|content|
 |----|-----------|-------|
 |204 |successfully modified|none|
