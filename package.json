@@ -1,6 +1,6 @@
 {
   "name": "ctfjs",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "A CTF platform backend API.",
   "main": "index.js",
   "scripts": {
@@ -12,12 +12,16 @@
   },
   "author": "kmh11",
   "license": "MIT",
+  "bin": {
+    "ctfjs": "./index.js"
+  },
   "bugs": {
     "url": "https://github.com/blairsec/ctfjs/issues"
   },
   "homepage": "https://github.com/blairsec/ctfjs#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "commander": "^2.14.1",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
     "express-validator": "^5.0.2",
@@ -27,6 +31,7 @@
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.1",
     "passport-local": "^1.0.0",
-    "passport-local-mongoose": "^4.5.0"
+    "passport-local-mongoose": "^4.5.0",
+    "pm2": "^2.10.1"
   }
 }

@@ -6,14 +6,29 @@ It is still in development, and is not ready to be used to host an actual CTF ye
 ## Documentation
 Documentation is available at [https://blairsec.github.io/ctfjs/](https://blairsec.github.io/ctfjs/).
 
-## Setup
-Setup is simple and requires only a few steps:
-1. Set up a MongoDB server and put the database URI in config.js.
-2. Set the secret key in config.js to something secret.
+## Installation
+```
+npm install -g ctfjs
+```
 
 ## Deployment
-Remember, this is just a REST API and requires a front end to go with it. To run ctfjs, you can simply run:
+Remember, this is just a REST API and requires a front end to go with it. To start ctfs, run:
 ```
-node index.js
+ctfjs start
 ```
-For production, it is recommended you use something like [pm2](https://github.com/Unitech/pm2) or [forever](https://github.com/foreverjs/forever) to run the application.
+
+To stop ctfjs, run:
+```
+ctfjs stop
+```
+
+By default ctfjs runs on port 3000 with a randomly generated secret key, and tries to use `localhost` for MongoDB. These 
+can options be changed with the arguments `-p` (port), `-s` (secret key), and `-d` (database URI).
+For more information run:
+```
+ctfjs start --help
+```
+The username and password for the database can be included in the URI with the following format:
+```
+mongodb://username:password@host:port/database
+```
