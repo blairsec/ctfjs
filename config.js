@@ -1,3 +1,4 @@
 module.exports = {
-  jwt_secret: '<REDACTED>'
+  jwt_secret: '<REDACTED>',
+  db_uri: 'mongodb://localhost/ctfjs'
 }

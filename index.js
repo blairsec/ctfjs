@@ -6,7 +6,7 @@ var Team = require('./models/team')
 var Submission = require('./models/submission')
 
 var mongoose = require('mongoose')
-mongoose.connect('mongodb://localhost/ctfjs')
+mongoose.connect(config.db_uri)
 
 
 // server config
