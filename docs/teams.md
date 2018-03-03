@@ -10,6 +10,7 @@ Creates and joins a team.
 |name|string|yes|none|
 |affiliation|string|no|none|
 |passcode|string|yes|none|
+
 ### Responses
 
 |code|description|content|
@@ -50,6 +51,7 @@ Joins a team.
 |----|----|--------|------------|
 |name|string|yes|none|
 |passcode|string|yes|none|
+
 ### Responses
 
 |code|description|content|
@@ -71,6 +73,7 @@ User must either be an admin or modifying their own team.
 |----|----|--------|------------|
 |name|string|no|none|
 |affiliation|string|no|none|
+
 ### Responses
 
 |code|description|content|

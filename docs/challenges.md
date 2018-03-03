@@ -17,6 +17,7 @@ Submits a flag for a challenge. Requires the user to be on a team.
 |name|type|required|requirements|
 |----|----|--------|------------|
 |flag|string|yes|none|
+
 ### Responses
 
 |code|description|content|

@@ -8,6 +8,7 @@ Creates and sends an authentication token.
 |----|----|--------|------------|
 |username|string|yes|none|
 |password|string|yes|none|
+
 ### Responses
 
 |code|description|content|

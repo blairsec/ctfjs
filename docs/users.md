@@ -11,6 +11,7 @@ Creates a new user.
 |password|string|yes|length >= 8|
 |email|string|yes|_something_@_something_._something_|
 |eligible|boolean|yes|none|
+
 ### Responses
 
 |code|description|content|
