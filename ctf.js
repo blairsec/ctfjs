@@ -37,6 +37,11 @@ app.use('/users', usersRouter)
 app.use('/teams', teamsRouter)
 app.use('/challenges', challengesRouter)
 
+app.use(function (err, req, res, next) {
+  console.error(err.stack)
+  res.status(500).json({message: "internal_server_error"})
+})
+
 // passport config
 var LocalStrategy = require('passport-local').Strategy
 var JwtStrategy = require('passport-jwt').Strategy
