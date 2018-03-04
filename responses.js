@@ -1,4 +1,4 @@
-function challenge(challengeObject, admin) {
+function challenge(challengeObject, solved, admin) {
   var response = {
     id: challengeObject._id,
     title: challengeObject.title,
@@ -6,7 +6,7 @@ function challenge(challengeObject, admin) {
     value: challengeObject.value,
     author: challengeObject.author,
     category: challengeObject.category,
-    solved: challengeObject.solved
+    solved: solved ? solved : false
   }
   if (admin) response.flag = challengeObject.flag
   return response

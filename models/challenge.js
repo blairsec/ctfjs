@@ -42,8 +42,10 @@ schema.virtual('submissions', {
   localField: '_id',
   foreignField: 'challenge'
 })
-schema.virtual('solved').get(function () {
-  return this.submissions.filter(submission => submission.content === this.flag).length > 0
-})
+
+schema.methods.solved = function (teamId) {
+  console.log(this.submissions.filter(submission => submission.content === this.flag))
+  return this.submissions.filter(submission => submission.content === this.flag && (submission.team === teamId || submission.team._id === teamId)).length > 0
+}
 
 module.exports = mongoose.model('Challenge', schema)

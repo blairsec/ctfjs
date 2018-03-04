@@ -11,9 +11,11 @@ var { check, validationResult } = require('express-validator/check')
 
 
 // get a list of challenges
-router.get('/', async (req, res) => {
-  var challenges = await Challenge.find({}).populate({ path: 'submissions', populate: { path: 'user team' } }).exec()
-  res.json(challenges.map(challenge => responses.challenge(challenge)))
+router.get('/', async (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, async function (err, user) {
+    var challenges = await Challenge.find({}).populate({path: 'submissions', populate: {path: 'user team', populate: { path: 'submissions' }}}).exec()
+    res.json(challenges.map(challenge => responses.challenge(challenge, user && user.team ? challenge.solved(user.team._id) : null)))
+  })(req, res, next)
 })
 
 // create a challenge
