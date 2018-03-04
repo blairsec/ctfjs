@@ -1,6 +1,6 @@
 {
   "name": "ctfjs",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A CTF platform backend API.",
   "main": "index.js",
   "scripts": {
