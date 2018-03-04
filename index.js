@@ -33,8 +33,8 @@ program
   .option('-d --database <database_uri>', 'database URI')
   .option('-p --port <port>', 'port to listen on')
   .action(function (command) {
-    if (command.secret) config.jwt_secret = command.secret
-    if (command.uri) config.db_uri = command.uri
+    if (command.secretKey) config.jwt_secret = command.secretKey
+    if (command.database) config.db_uri = command.database
     if (command.port) config.port = command.port
     if (command.restart) stop(function () { start(function () { process.exit(0) }) })
     else start(function () { process.exit(0) })

@@ -44,7 +44,6 @@ schema.virtual('submissions', {
 })
 
 schema.methods.solved = function (teamId) {
-  console.log(this.submissions.filter(submission => submission.content === this.flag))
   return this.submissions.filter(submission => submission.content === this.flag && (submission.team === teamId || submission.team._id === teamId)).length > 0
 }
 

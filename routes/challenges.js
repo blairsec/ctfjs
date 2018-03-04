@@ -27,7 +27,6 @@ router.post('/', [
   check('flag').exists(),
   check('category').exists()
 ], passport.authenticate('jwt', { session: false }), async (req, res) => {
-  console.log(req.user)
   if (req.user.admin) {
     // check if data was valid
     var errors = validationResult(req)
