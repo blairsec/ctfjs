@@ -8,6 +8,9 @@ It is sent and received with the cookie `token`.
 All request bodies and responses should be content-type `application/json`.
 Error responses are either empty or of the form `{"message": <string>}`.
 
+Requests that are not GET or HEAD require a matching `_csrf` cookie and body property. If they do not pass this check, 
+they will return 400 with the body `{"message": "invalid_csrf"}`.
+
 ## Routes
 ### [/users](users.md)
 Creating, modifying, and viewing users.

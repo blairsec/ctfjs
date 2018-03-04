@@ -1,4 +1,5 @@
 var config = require('./config')
+var url = require('url')
 
 // db config
 var User = require('./models/user')
@@ -23,6 +24,13 @@ var challengesRouter = require('./routes/challenges')
 app.use(passport.initialize())
 app.use(bodyParser.json())
 app.use(cookieParser())
+app.use(function (req, res, next) {
+  if (req.headers.host === url.parse(req.headers.referer).host && req.method === "GET" || req.method === "HEAD" || (req.cookies && req.cookies._csrf && req.body && req.body._csrf && req.cookies._csrf === req.body._csrf)) {
+    next()
+  } else {
+    res.status(400).json({message: "invalid_csrf"})
+  }
+})
 app.use('/auth', authRouter)
 app.use('/users', usersRouter)
 app.use('/teams', teamsRouter)
