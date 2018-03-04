@@ -7,10 +7,44 @@ var responses = require('../responses')
 var Submission = require('../models/submission')
 var router = express.Router()
 
+var { check, validationResult } = require('express-validator/check')
+
+
 // get a list of challenges
 router.get('/', async (req, res) => {
   var challenges = await Challenge.find({}).populate({ path: 'submissions', populate: { path: 'user team' } }).exec()
   res.json(challenges.map(challenge => responses.challenge(challenge)))
+})
+
+// create a challenge
+router.post('/', [
+  check('title').exists(),
+  check('description').exists(),
+  check('value').isNumeric(),
+  check('author').exists(),
+  check('flag').exists(),
+  check('category').exists()
+], passport.authenticate('jwt', { session: false }), async (req, res) => {
+  console.log(req.user)
+  if (req.user.admin) {
+    // check if data was valid
+    var errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({message: 'invalid_values'})
+    }
+    var challenge = new Challenge({
+      title: req.body.title,
+      description: req.body.description,
+      value: req.body.value,
+      author: req.body.author,
+      flag: req.body.flag,
+      category: req.body.category
+    })
+    await challenge.save()
+    res.sendStatus(201)
+  } else {
+    res.status(403).json({message: 'action_forbidden'})
+  }
 })
 
 // submit flag

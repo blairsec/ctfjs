@@ -9,6 +9,29 @@ Gets a list of challenges.
 |----|-----------|-------|
 |200|a list of challenges|array of [challenges](index.md#challenge)|
 
+## Create a challenge :lock:
+Creates a challenge. Requires admin.
+### `POST /challenges`
+### Request Body
+
+|name|type|required|requirements|
+|----|----|--------|------------|
+|title|string|yes|none|
+|description|string|yes|none|
+|value|number|yes|none|
+|author|string|yes|none|
+|flag|string|yes|none|
+|category|string|yes|none|
+
+### Responses
+
+|code|description|content|
+|----|-----------|-------|
+|201|successfully created challenge|none|
+|400|invalid data provided|`{"message": "invalid_values"}`|
+|403|user is not an admin|`{"message": "action_forbidden"}`|
+|401|authentication failed|none|
+
 ## Submit a flag :lock:
 Submits a flag for a challenge. Requires the user to be on a team.
 ### `POST /challenges/{id}/submissions`

@@ -14,7 +14,7 @@ npm install -g ctfjs
 ```
 
 ## Deployment
-Remember, this is just a REST API and requires a front end to go with it. To start ctfs, run:
+Remember, this is just a REST API and requires a front end to go with it. To start ctfjs, run:
 ```
 ctfjs start
 ```
