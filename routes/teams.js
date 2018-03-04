@@ -59,7 +59,7 @@ router.get('/:team', async (req, res, next) => {
         if (user === false) return res.sendStatus(401)
         team = await Team.findOne({ _id: user.team }).populate('members').populate({ path: 'submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }).exec()
       }
-      if (team) res.json(responses.team(team, user.team._id === team._id))
+      if (team) res.json(responses.team(team, user.team && user.team._id === team._id))
       else throw "team_not_found"
     } catch (err) {
       console.log(err)
