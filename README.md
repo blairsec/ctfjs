@@ -3,7 +3,7 @@
 
 ctfjs is a CTF (capture the flag) competition backend written in Node.js.
 
-It is still in development, and is not ready to be used to host an actual CTF yet.
+It is still in development, and is not ready to be used to host an actual CTF.
 
 ## Documentation
 Documentation is available at [https://blairsec.github.io/ctfjs/](https://blairsec.github.io/ctfjs/).
@@ -25,7 +25,7 @@ ctfjs stop
 ```
 
 By default ctfjs runs on port 3000 with a randomly generated secret key, and tries to use `localhost` for MongoDB. These 
-can options be changed with the arguments `-p` (port), `-s` (secret key), and `-d` (database URI).
+options can be changed with the arguments `-p` (port), `-s` (secret key), and `-d` (database URI).
 For more information run:
 ```
 ctfjs start --help
