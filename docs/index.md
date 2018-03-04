@@ -1,4 +1,4 @@
-ctfjs is a CTF (capture the flag) backend written in node.js.
+ctfjs is a CTF (capture the flag) competition backend written in Node.js.
 
 ## Authentication
 A JWT given by the server is used for authentication for all routes that require it.
