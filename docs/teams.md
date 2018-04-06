@@ -2,7 +2,7 @@
 
 ## Create and join a team :lock:
 Creates and joins a team.
-### `POST /teams`
+### `POST /competitions/{id}/teams`
 ### Request Body
 
 |name|type|required|requirements|
@@ -23,7 +23,7 @@ Creates and joins a team.
 
 ## Get a list of teams
 Gets a list of teams.
-### `GET /teams`
+### `GET /competitions/{id}/teams`
 ### Responses
 
 |code|description|content|
@@ -32,7 +32,7 @@ Gets a list of teams.
 
 ## Get a team
 Gets a single team.
-### `GET /teams/{id}`
+### `GET /competitions/{id}/teams/{id}`
 Note: `id` can be `self` to get the current user's team
 ### Responses
 
@@ -44,7 +44,7 @@ Note: `id` can be `self` to get the current user's team
 
 ## Join a team :lock:
 Joins a team.
-### `PATCH /teams`
+### `PATCH /competitions/{id}/teams`
 ### Request body
 
 |name|type|required|requirements|
@@ -63,7 +63,7 @@ Joins a team.
 
 ## Modify a team :lock:
 Modifies a team. Requires authentication.
-### `PATCH /teams/{id}`
+### `PATCH /competitions/{id}/teams/{id}`
 Note: `id` can be `self` to modify the current user's team.
 
 User must either be an admin or modifying their own team.

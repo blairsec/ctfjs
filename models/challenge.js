@@ -25,6 +25,9 @@ var schema = new mongoose.Schema({
   category: {
     type: String,
     required: true
+  },
+  competition: {
+    type: Number
   }
 }, {
   timestamps: true,

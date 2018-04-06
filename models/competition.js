@@ -7,14 +7,6 @@ var schema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  challenges: [{
-    type: Number,
-    ref: 'Challenge'
-  }],
-  teams: [{
-    type: Number,
-    ref: 'Team'
-  }],
   start: Date,
   end: Date
 }, {

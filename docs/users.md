@@ -2,7 +2,7 @@
 
 ## Create a new user
 Creates a new user.
-### `POST /users`
+### `POST /competitions/{id}/users`
 ### Request Body
 
 |name|type|required|requirements|
@@ -22,7 +22,7 @@ Creates a new user.
 
 ## Get a list of users
 Gets a list of users.
-### `GET /users`
+### `GET /competitions/{id}/users`
 ### Responses
 
 |code|description|content|
@@ -31,7 +31,7 @@ Gets a list of users.
 
 ## Get a user
 Gets a single user.
-### `GET /users/{id}`
+### `GET /competitions/{id}/users/{id}`
 Note: `id` can be `self` to get the currently authenticated user
 ### Responses
 
@@ -42,7 +42,7 @@ Note: `id` can be `self` to get the currently authenticated user
 
 ## Modify a user :lock:
 Modifies a user. Requires authentication.
-### `PATCH /users/{id}`
+### `PATCH /competitions/{id}/users/{id}`
 Note: `id` can be `self` to modify the currently authenticated user.
 
 The user must be either an admin or the user they are trying to modify.

@@ -7,15 +7,13 @@ var schema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    unique: true
   },
   email: {
     type: String,
     required: true,
     index: true,
-    unique: true,
     lowercase: true,
-    trim: true
+    trim: true,
   },
   eligible: {
     type: Boolean,
@@ -25,6 +23,7 @@ var schema = new mongoose.Schema({
     type: Number,
     ref: 'Team'
   },
+  competition: Number,
   admin: Boolean
 }, {
   timestamps: true,
@@ -35,8 +34,9 @@ var schema = new mongoose.Schema({
     virtuals: true
   }
 })
+schema.index({ email: 1, competition: 1 }, { unique: true })
 schema.plugin(autoIncrement.plugin, { model: 'User', startAt: 1 })
-schema.plugin(passportLocalMongoose, { usernameCaseInsensitive: true })
+schema.plugin(passportLocalMongoose, { usernameCaseInsensitive: true, usernameField: "usernameUnique" })
 
 schema.virtual('submissions', {
   ref: 'Submission',

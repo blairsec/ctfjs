@@ -14,6 +14,9 @@ var schema = new mongoose.Schema({
     type: Number,
     ref: 'Team'
   },
+  competition: {
+    type: Number
+  },
   content: String
 }, {
   timestamps: true,

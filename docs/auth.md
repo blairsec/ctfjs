@@ -1,7 +1,7 @@
 # Auth routes
 ## Create an auth token
 Creates and sends an authentication token.
-### `POST /auth`
+### `POST /competitions/{id}/auth`
 ### Request Body
 
 |name|type|required|requirements|

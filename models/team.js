@@ -10,14 +10,15 @@ var schema = new mongoose.Schema({
   nameLower: {
     type: String,
     required: true,
-    index: true,
-    unique: true,
     lowercase: true,
     trim: true
   },
   passcode: {
     type: String,
     required: true
+  },
+  competition: {
+    type: Number
   },
   affiliation: String
 }, {
@@ -29,6 +30,7 @@ var schema = new mongoose.Schema({
     virtuals: true
   }
 })
+schema.index({ nameLower: 1, competition: 1 }, { unique: true })
 schema.plugin(autoIncrement.plugin, { model: 'Team', startAt: 1 })
 
 

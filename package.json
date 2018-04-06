@@ -2,7 +2,7 @@
   "name": "ctfjs",
   "version": "0.1.6",
   "description": "A CTF platform backend API.",
-  "main": "index.js",
+  "main": "ctf.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,7 +13,7 @@
   "author": "kmh11",
   "license": "MIT",
   "bin": {
-    "ctfjs": "./index.js"
+    "ctfjs": "./command.js"
   },
   "bugs": {
     "url": "https://github.com/blairsec/ctfjs/issues"

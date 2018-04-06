@@ -8,7 +8,17 @@ function challenge(challengeObject, solved, admin) {
     category: challengeObject.category,
     solved: solved ? solved : false
   }
+  if (challengeObject.submissions) response.solves = challengeObject.submissions.map(submissionObject => submission(submissionObject))
   if (admin) response.flag = challengeObject.flag
+  return response
+}
+
+function competition(competitionObject) {
+  var response = {
+    name: competitionObject.name,
+    start: competitionObject.start,
+    end: competitionObject.end
+  }
   return response
 }
 
