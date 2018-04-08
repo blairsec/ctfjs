@@ -69,14 +69,14 @@ module.exports = class CTF {
     router.use(passport.initialize())
     router.use(bodyParser.json())
     router.use(cookieParser())
-    /*router.use(function (req, res, next) {
+    router.use(function (req, res, next) {
       if (req.headers.referer && req.headers.host === url.parse(req.headers.referer).host && (req.method === "GET" || req.method === "HEAD" ||
         (req.cookies && req.cookies._csrf && req.body && req.body._csrf && req.cookies._csrf === req.body._csrf))) {
         next()
       } else {
         res.status(400).json({message: "invalid_csrf"})
       }
-    })*/
+    })
     var assignCompetition = async function (req, res, next) {
       req.competition = req.params.competition
       var competition = await Competition.findOne({ _id: req.competition })

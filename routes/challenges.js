@@ -20,12 +20,12 @@ router.get('/', async (req, res, next) => {
 
 // create a challenge
 router.post('/', [
-  body('title').exists(),
-  body('description').exists(),
+  body('title').isString().isLength({ min: 1 }),
+  body('description').isString().isLength({ min: 1 }),
   body('value').isNumeric(),
-  body('author').exists(),
-  body('flag').exists(),
-  body('category').exists()
+  body('author').isString().isLength({ min: 1 }),
+  body('flag').isString().isLength({ min: 1 }),
+  body('category').isString().isLength({ min: 1 })
 ], passport.authenticate('jwt', { session: false }), async (req, res) => {
   if (req.user.admin) {
     // check if data was valid

@@ -9,8 +9,8 @@ var { body, validationResult } = require('express-validator/check')
 
 // create + join team
 router.post('/', [
-  body('name').exists(),
-  body('passcode').exists()
+  body('name').isString().isLength({ min: 1 }),
+  body('passcode').isString().isLength({ min: 1 })
 ], passport.authenticate('jwt', { session: false }), async (req, res) => {
   // check if data was valid
   var errors = validationResult(req)

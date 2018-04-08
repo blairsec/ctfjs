@@ -9,7 +9,7 @@ var { body, validationResult } = require('express-validator/check')
 
 // register a user
 router.post('/', [
-  body('username').exists(),
+  body('username').isString().isLength({ min: 1 }),
   body('password').isLength({ min: 8 }),
   body('email').isEmail(),
   body('eligible').isBoolean()
