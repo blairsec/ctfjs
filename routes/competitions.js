@@ -28,6 +28,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), [
   if (req.user.admin) {
     // check if data was valid
     var errors = validationResult(req)
+    console.log(errors.mapped())
     if (!errors.isEmpty()) {
       return res.status(400).json({message: 'invalid_values'})
     }

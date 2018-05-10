@@ -1,4 +1,22 @@
-function challenge(challengeObject, solved, admin) {
+function _populate (type, parents, paths) {
+  if (type === "Challenge" && parents.indexOf("Challenge") === -1) {
+    paths.push({path: 'Submission', populate: _populate("Submission", parents, [])})
+  } else if (type === "Submission" && parents.indexOf("Submission") === -1) {
+  } else if (type === 'Team' && parents.indexOf('Team') === -1) {
+    paths.push({ path: 'members', populate: _populate('User', parents, []) })
+    paths.push({ path: 'submissions', populate: _populate('Submission', parents, []) })
+  } else if (type === 'User' && parents.indexOf('User') === -1) {
+    paths.push({ path: 'submissions', populate: _populate('Submission', parents, []) })
+  }
+  return paths
+}
+
+function populate (object, type, parent) {
+  console.log(_populate("Challenge", [parent], []))
+  return object
+}
+
+function challenge (challengeObject, solved, admin) {
   var response = {
     id: challengeObject._id,
     title: challengeObject.title,
@@ -13,8 +31,9 @@ function challenge(challengeObject, solved, admin) {
   return response
 }
 
-function competition(competitionObject) {
+function competition (competitionObject) {
   var response = {
+    id: competitionObject._id,
     name: competitionObject.name,
     start: competitionObject.start,
     end: competitionObject.end
@@ -22,7 +41,7 @@ function competition(competitionObject) {
   return response
 }
 
-function submission(solveObject, admin) {
+function submission (solveObject, admin) {
   var response = {
     time: solveObject.createdAt
   }
@@ -33,7 +52,7 @@ function submission(solveObject, admin) {
   return response
 }
 
-function team(teamObject, self) {
+function team (teamObject, self) {
   var response = {
     id: teamObject._id,
     name: teamObject.name,
@@ -48,15 +67,17 @@ function team(teamObject, self) {
   return response
 }
 
-function user(userObject) {
+function user (userObject) {
   var response = {
     id: userObject._id,
     username: userObject.username,
     eligible: userObject.eligible,
     created: userObject.createdAt
   }
+  if (userObject.admin === true) response.admin = true
   if (userObject.team && typeof userObject.team === "object") response['team'] = team(userObject.team)
   return response
 }
 
-module.exports = { user, team, submission, challenge }
+module.exports = { user, team, submission, challenge, competition, populate }
+

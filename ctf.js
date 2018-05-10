@@ -33,7 +33,10 @@ module.exports = class CTF {
       },
       secretOrKey: config.jwt_secret
     }, function (payload, done) {
-      User.findOne({_id: payload.id, competition: payload.competition}).populate({
+      var query = { _id: payload.id }
+      if (payload.admin === true) query.admin = true
+      if (payload.competition) query.competition = payload.competition
+      User.findOne(query).populate({
         path: 'team',
         populate: {path: 'members submissions', populate: {path: 'challenge', populate: {path: 'submissions'}}},
         model: Team
@@ -60,6 +63,7 @@ module.exports = class CTF {
     var teamsRouter = require('./routes/teams')
     var challengesRouter = require('./routes/challenges')
     var competitionsRouter = require('./routes/competitions')
+    var adminRouter = require('./routes/admin')
 
     router.use(function (req, res, next) {
       req.jwt_secret = this.jwt_secret
@@ -79,7 +83,9 @@ module.exports = class CTF {
     })
     var assignCompetition = async function (req, res, next) {
       req.competition = req.params.competition
-      var competition = await Competition.findOne({ _id: req.competition })
+      if (!isNaN(competition)) {
+        var competition = await Competition.findOne({ _id: req.competition })
+      } else { var competition = undefined }
       if (competition) { next() }
       else { res.status(404).json({ message: 'competition_not_found' }) }
     }
@@ -88,6 +94,7 @@ module.exports = class CTF {
     router.use('/competitions/:competition/teams', assignCompetition, teamsRouter)
     router.use('/competitions/:competition/challenges', assignCompetition, challengesRouter)
     router.use('/competitions', competitionsRouter)
+    router.use('/admin', adminRouter)
 
     router.use(function (err, req, res, next) {
       console.error(err.stack)
