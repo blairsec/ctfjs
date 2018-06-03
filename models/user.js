@@ -23,7 +23,10 @@ var schema = new mongoose.Schema({
     type: Number,
     ref: 'Team'
   },
-  competition: Number,
+  competition: {
+    type: Number,
+    ref: 'Competition'
+  },
   admin: Boolean
 }, {
   timestamps: true,

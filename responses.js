@@ -1,18 +1,29 @@
 function _populate (type, parents, paths) {
-  if (type === "Challenge" && parents.indexOf("Challenge") === -1) {
-    paths.push({path: 'Submission', populate: _populate("Submission", parents, [])})
-  } else if (type === "Submission" && parents.indexOf("Submission") === -1) {
-  } else if (type === 'Team' && parents.indexOf('Team') === -1) {
-    paths.push({ path: 'members', populate: _populate('User', parents, []) })
-    paths.push({ path: 'submissions', populate: _populate('Submission', parents, []) })
-  } else if (type === 'User' && parents.indexOf('User') === -1) {
-    paths.push({ path: 'submissions', populate: _populate('Submission', parents, []) })
+  parents = parents.slice(0)
+  parents.push(type)
+  if (type === "Challenge") {
+    if (parents.indexOf('Submission') === -1) { paths.push({path: 'submissions', populate: _populate("Submission", parents, [])}) }
+  } else if (type === "Submission") {
+    if (parents.indexOf('User') === -1) { paths.push({ path: 'user', populate: _populate('User', parents, []) }) }
+    if (parents.indexOf('Team') === -1) { paths.push({ path: 'team', populate: _populate('Team', parents, []) }) }
+    if (parents.indexOf('Challenge') === -1) { paths.push({ path: 'challenge', populate: _populate('Challenge', parents, []) }) }
+  } else if (type === 'Team') {
+    if (true) { paths.push({ path: 'members', populate: _populate('User', parents, []) }) }
+    if (true) { paths.push({ path: 'submissions', populate: _populate('Submission', parents, []) }) }
+    if (parents.indexOf('Competition') === -1) { paths.push({ path: 'competition', populate: _populate('Competition', parents, []) }) }
+  } else if (type === 'User') {
+    if (parents.indexOf('Submission') === -1) { paths.push({ path: 'submissions', populate: _populate('Submission', parents, []) }) }
+    if (parents.indexOf('Team') === -1) { paths.push({ path: 'team', populate: _populate('Team', parents, []) }) }
+    if (parents.indexOf('Competition') === -1) { paths.push({ path: 'competition', populate: _populate('Competition', parents, []) }) }
   }
   return paths
 }
 
 function populate (object, type, parent) {
-  console.log(_populate("Challenge", [parent], []))
+  var paths = _populate(object.model.modelName, [parent], [])
+  for (var i = 0; i < paths.length; i++) {
+    object.populate(paths[i])
+  }
   return object
 }
 
@@ -36,7 +47,8 @@ function competition (competitionObject) {
     id: competitionObject._id,
     name: competitionObject.name,
     start: competitionObject.start,
-    end: competitionObject.end
+    end: competitionObject.end,
+    about: competitionObject.about
   }
   return response
 }
@@ -67,17 +79,25 @@ function team (teamObject, self) {
   return response
 }
 
-function user (userObject) {
+function user (userObject, self, admin) {
   var response = {
     id: userObject._id,
     username: userObject.username,
     eligible: userObject.eligible,
     created: userObject.createdAt
   }
+  if (self === true || admin === true) response.email = userObject.email
   if (userObject.admin === true) response.admin = true
   if (userObject.team && typeof userObject.team === "object") response['team'] = team(userObject.team)
   return response
 }
 
-module.exports = { user, team, submission, challenge, competition, populate }
+function home (homeObject) {
+  return {
+    title: homeObject.title,
+    content: homeObject.content
+  }
+}
+
+module.exports = { home, user, team, submission, challenge, competition, populate }
 

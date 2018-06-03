@@ -47,7 +47,7 @@ router.post('/', [
 
 // get list of teams
 router.get('/', async (req, res, next) => {
-  var teams = await Team.find({competition: req.competition}).populate('members').populate({ path: 'submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }).exec()
+  var teams = await responses.populate(Team.find({competition: req.competition})).exec()
   res.json(teams.map(team => responses.team(team)))
 })
 
@@ -55,10 +55,10 @@ router.get('/', async (req, res, next) => {
 router.get('/:team', async (req, res, next) => {
   passport.authenticate('jwt', { session: false }, async function (err, user) {
     try {
-      if (req.params.team !== 'self') team = await Team.findOne({ competition: req.competition, _id: req.params.team }).populate('members').populate({ path: 'submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }).exec()
+      if (req.params.team !== 'self') team = await responses.populate(Team.findOne({ competition: req.competition, _id: req.params.team })).exec()
       else {
         if (user === false) return res.sendStatus(401)
-        team = await Team.findOne({ competition: req.competition, _id: user.team._id }).populate('members').populate({ path: 'submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }).exec()
+        team = await responses.populate(Team.findOne({ competition: req.competition, _id: user.team._id })).exec()
       }
       if (team) res.json(responses.team(team, user.team && user.team._id === team._id))
       else throw "team_not_found"
@@ -71,7 +71,7 @@ router.get('/:team', async (req, res, next) => {
 
 // join a team
 router.patch('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
-  var team = await Team.findOne({ competition: req.competition, nameLower: req.body.name.toLowerCase() }).populate('members').exec()
+  var team = await responses.populate(Team.findOne({ competition: req.competition, nameLower: req.body.name.toLowerCase() })).exec()
   if (team) {
     if (team.members.filter(member => member.id == req.user._id).length > 0) {
       return res.status(403).json({message: "already_in_team"})
@@ -91,7 +91,7 @@ router.patch('/:team', passport.authenticate('jwt', { session: false }), async (
   if (req.params.team === 'self') req.params.team = req.user.team
   req.params.team = parseInt(req.params.team)
   if (req.user.admin === true || req.user.team._id === req.params.team) {
-    var team = await Team.findOne({ competition: req.competition, _id: req.params.team }).populate('members').populate('submissions').exec()
+    var team = await responses.populate(Team.findOne({ competition: req.competition, _id: req.params.team })).exec()
     if (team) {
       if (req.body.name) team.name = req.body.name
       if (req.body.affiliation) team.affiliation = req.body.affiliation

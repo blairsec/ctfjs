@@ -1,4 +1,5 @@
 var passport = require('passport')
+var responses = require('./responses')
 var url = require('url')
 
 module.exports = class CTF {
@@ -36,11 +37,7 @@ module.exports = class CTF {
       var query = { _id: payload.id }
       if (payload.admin === true) query.admin = true
       if (payload.competition) query.competition = payload.competition
-      User.findOne(query).populate({
-        path: 'team',
-        populate: {path: 'members submissions', populate: {path: 'challenge', populate: {path: 'submissions'}}},
-        model: Team
-      }).populate('submissions').exec(function (err, user) {
+      responses.populate(User.findOne(query)).exec(function (err, user) {
         if (err) {
           return done(err, false)
         }
@@ -64,6 +61,8 @@ module.exports = class CTF {
     var challengesRouter = require('./routes/challenges')
     var competitionsRouter = require('./routes/competitions')
     var adminRouter = require('./routes/admin')
+    var selfRouter = require('./routes/self')
+    var homeRouter = require('./routes/home')
 
     router.use(function (req, res, next) {
       req.jwt_secret = this.jwt_secret
@@ -75,7 +74,8 @@ module.exports = class CTF {
     router.use(cookieParser())
     router.use(function (req, res, next) {
       if (req.headers.referer && req.headers.host === url.parse(req.headers.referer).host && (req.method === "GET" || req.method === "HEAD" ||
-        (req.cookies && req.cookies._csrf && req.body && req.body._csrf && req.cookies._csrf === req.body._csrf))) {
+        (req.cookies && req.cookies._csrf && ((req.body && req.body._csrf && req.cookies._csrf === req.body._csrf) ||
+        (req.query && req.query._csrf && req.cookies._csrf === req.query._csrf))))) {
         next()
       } else {
         res.status(400).json({message: "invalid_csrf"})
@@ -83,7 +83,7 @@ module.exports = class CTF {
     })
     var assignCompetition = async function (req, res, next) {
       req.competition = req.params.competition
-      if (!isNaN(competition)) {
+      if (!isNaN(req.competition)) {
         var competition = await Competition.findOne({ _id: req.competition })
       } else { var competition = undefined }
       if (competition) { next() }
@@ -95,6 +95,8 @@ module.exports = class CTF {
     router.use('/competitions/:competition/challenges', assignCompetition, challengesRouter)
     router.use('/competitions', competitionsRouter)
     router.use('/admin', adminRouter)
+    router.use('/self', selfRouter)
+    router.use('/home', homeRouter)
 
     router.use(function (err, req, res, next) {
       console.error(err.stack)

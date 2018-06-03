@@ -35,17 +35,21 @@ router.post('/', [
 })
 
 // get a list of users
-router.get('/', async (req, res) => {
-  var users = await User.find({competition: req.competition}).populate({ path: 'team', populate: { path: 'members submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }, model: Team }).populate('submissions').exec()
-  res.json(users.map(user => responses.user(user)))
+router.get('/', async (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, async function (err, self) {
+    var users = await responses.populate(User.find({competition: req.competition})).exec()
+    res.json(users.map(user => responses.user(user, self && user.id === self.id, self.admin === true)))
+  })(req, res, next)
 })
 
 // get info about a user
 router.get('/:user', async (req, res, next) => {
-  passport.authenticate('jwt', { session: false }, async function (err, user) {
+  passport.authenticate('jwt', { session: false }, async function (err, self) {
+    var user = self
     try {
-      if (req.params.user !== 'self') user = await User.findOne({ _id: req.params.user }).populate({ path: 'team', populate: { path: 'members submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }, model: Team }).populate('submissions').exec()
-      if (user) res.json(responses.user(user))
+      //if (req.params.user !== 'self') user = await User.findOne({ _id: req.params.user }).populate({ path: 'team', populate: { path: 'members submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }, model: Team }).populate('submissions').exec()
+      if (req.params.user !== 'self') user = await responses.populate(User.findOne({ _id: req.params.user })).exec()
+      if (user) res.json(responses.user(user, self.id === user.id, user.admin === true))
       else throw "user_not_found"
     } catch (err) {
       console.log(err)

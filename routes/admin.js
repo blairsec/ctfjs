@@ -16,7 +16,7 @@ router.post('/', [
 ], async (req, res, next) => {
   passport.authenticate('jwt', { session: false }, async function (err, user) {
     var admins = await User.find({ admin: true })
-    if (req.user && req.user.admin === true || admins.length == 0) {
+    if (req.user && req.user.admin === true || admins.length === 0) {
       User.register(new User({
         username: req.body.username,
         usernameUnique: req.body.username,
@@ -36,13 +36,12 @@ router.post('/', [
 
 // view admins
 router.get('/', async (req, res) => {
-  var admins = await User.find({ admin: true })
+  var admins = await responses.populate(User.find({ admin: true })).exec()
   res.json(admins.map(user => responses.user(user)))
 })
 
 // view self
 router.get('/self', passport.authenticate('jwt', { session: false }), async (req, res) => {
-  responses.populate(User.find({}), "User")
   if (req.user.admin === true) res.json(responses.user(req.user))
   else res.sendStatus(401)
 })

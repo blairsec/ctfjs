@@ -7,6 +7,7 @@ var schema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  about: String,
   start: Date,
   end: Date
 }, {

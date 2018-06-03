@@ -13,8 +13,8 @@ var { body, validationResult } = require('express-validator/check')
 // get a list of challenges
 router.get('/', async (req, res, next) => {
   passport.authenticate('jwt', { session: false }, async function (err, user) {
-    var challenges = await Challenge.find({ competition: req.competition }).populate({path: 'submissions', populate: {path: 'user team', populate: { path: 'members submissions', populate: 'challenge user team' }}}).exec()
-    res.json(challenges.map(challenge => responses.challenge(challenge, user && user.team ? challenge.solved(user.team._id) : null)))
+    var challenges = await responses.populate(Challenge.find({ competition: req.competition })).exec()
+    res.json(challenges.map(challenge => responses.challenge(challenge, user && user.team ? challenge.solved(user.team._id) : null, user ? user.admin : false)))
   })(req, res, next)
 })
 
@@ -53,8 +53,8 @@ router.post('/', [
 router.post('/:id/submissions', passport.authenticate('jwt', { session: false }), async (req, res) => {
   if (req.user.team) {
     try {
-      var challenge = await Challenge.findOne({ competition: req.competition, _id: req.params.id }).populate('submissions').exec()
-      var team = await Team.findOne({ competition: req.competition, _id: req.user.team }).populate('members').populate({ path: 'submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }).exec()
+      var challenge = await responses.populate(Challenge.findOne({ competition: req.competition, _id: req.params.id })).exec()
+      var team = await responses.populate(Team.findOne({ competition: req.competition, _id: req.user.team })).exec()
       if (team.solves.map(solve => solve.challenge._id).indexOf(challenge._id) === -1) {
         var submission = new Submission({
           team: team._id,
@@ -64,7 +64,7 @@ router.post('/:id/submissions', passport.authenticate('jwt', { session: false })
           competition: req.competition
         })
         await submission.save()
-        submission = await Submission.findOne({ competition: req.competition, _id: submission._id }).populate('challenge').exec()
+        submission = await responses.populate(Submission.findOne({ competition: req.competition, _id: submission._id })).exec()
         res.json({ correct: submission.correct })
       } else {
         res.status(400).json({ message: 'challenge_already_solved' })
@@ -75,6 +75,47 @@ router.post('/:id/submissions', passport.authenticate('jwt', { session: false })
     }
   } else {
     res.status(403).json({message: 'user_not_on_team'})
+  }
+})
+
+// modify a challenge
+router.patch('/:id', [
+  body('title').isString().isLength({ min: 1 }),
+  body('description').isString().isLength({ min: 1 }),
+  body('value').isNumeric(),
+  body('author').isString().isLength({ min: 1 }),
+  body('flag').isString().isLength({ min: 1 }),
+  body('category').isString().isLength({ min: 1 })
+], passport.authenticate('jwt', { session: false }), async (req, res) => {
+  if (req.user.admin) {
+    var challenge = await Challenge.findOne({ competition: req.competition, _id: req.params.id })
+    if (!challenge) return res.status(404).json({message: 'challenge_not_found'})
+
+    var errors = validationResult(req)
+    errors = errors.array().map(e => e.param)
+
+    if (req.body.title && errors.indexOf('title') === -1) challenge.title = req.body.title
+    if (req.body.description && errors.indexOf('description') === -1) challenge.description = req.body.description
+    if (req.body.value && errors.indexOf('value') === -1) challenge.value = req.body.value
+    if (req.body.author && errors.indexOf('author') === -1) challenge.author = req.body.author
+    if (req.body.flag && errors.indexOf('flag') === -1) challenge.flag = req.body.flag
+    if (req.body.category && errors.indexOf('category') === -1) challenge.category = req.body.category
+
+
+    challenge = await challenge.save()
+
+    res.sendStatus(204)
+  } else {
+    res.status(403).json({message: 'action_forbidden'})
+  }})
+
+// delete a challenge
+router.delete('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  if (req.user.admin) {
+    await Challenge.deleteOne({ _id: req.params.id })
+    res.sendStatus(204)
+  } else {
+    res.status(403).json({message: 'action_forbidden'})
   }
 })
 

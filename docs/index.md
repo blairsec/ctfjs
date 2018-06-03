@@ -18,6 +18,8 @@ Creating, modifying, and viewing users.
 Creating, joining, modifying, and viewing teams.
 ### [/auth](auth.md)
 Generating authentication tokens.
+### [/self](self.md)
+Getting information about currently logged in user.
 ### [/challenges](challenges.md)
 Creating, modifying, and viewing challenges, and submitting flags.
 
