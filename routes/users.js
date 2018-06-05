@@ -5,14 +5,14 @@ var Team = require('../models/team')
 var responses = require('../responses')
 var router = express.Router()
 
-var { check, validationResult } = require('express-validator/check')
+var { body, validationResult } = require('express-validator/check')
 
 // register a user
 router.post('/', [
-  check('username').exists(),
-  check('password').isLength({ min: 8 }),
-  check('email').isEmail(),
-  check('eligible').isBoolean()
+  body('username').isString().isLength({ min: 1 }),
+  body('password').isLength({ min: 8 }),
+  body('email').isEmail(),
+  body('eligible').isBoolean()
 ], async (req, res) => {
   // check if data was valid
   var errors = validationResult(req)
@@ -21,8 +21,10 @@ router.post('/', [
   }
   User.register(new User({
     username: req.body.username,
+    usernameUnique: req.body.username + '_' + req.competition.toString(),
     email: req.body.email,
-    eligible: req.body.eligible
+    eligible: req.body.eligible,
+    competition: req.competition
   }), req.body.password, (err, user) => {
     if (err) {
       res.status(409).json({message: 'username_email_conflict'})
@@ -33,17 +35,21 @@ router.post('/', [
 })
 
 // get a list of users
-router.get('/', async (req, res) => {
-  var users = await User.find({}).populate({ path: 'team', populate: { path: 'members submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }, model: Team }).populate('submissions').exec()
-  res.json(users.map(user => responses.user(user)))
+router.get('/', async (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, async function (err, self) {
+    var users = await responses.populate(User.find({competition: req.competition})).exec()
+    res.json(users.map(user => responses.user(user, self && user.id === self.id, self.admin === true)))
+  })(req, res, next)
 })
 
 // get info about a user
 router.get('/:user', async (req, res, next) => {
-  passport.authenticate('jwt', { session: false }, async function (err, user) {
+  passport.authenticate('jwt', { session: false }, async function (err, self) {
+    var user = self
     try {
-      if (req.params.user !== 'self') user = await User.findOne({ _id: req.params.user }).populate({ path: 'team', populate: { path: 'members submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }, model: Team }).populate('submissions').exec()
-      if (user) res.json(responses.user(user))
+      //if (req.params.user !== 'self') user = await User.findOne({ _id: req.params.user }).populate({ path: 'team', populate: { path: 'members submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }, model: Team }).populate('submissions').exec()
+      if (req.params.user !== 'self') user = await responses.populate(User.findOne({ _id: req.params.user })).exec()
+      if (user) res.json(responses.user(user, self.id === user.id, user.admin === true))
       else throw "user_not_found"
     } catch (err) {
       console.log(err)
@@ -57,7 +63,7 @@ router.patch('/:user', passport.authenticate('jwt', { session: false }), async (
   if (req.params.user === 'self') req.params.user = req.user._id
   req.params.user = parseInt(req.params.user)
   if (req.user.admin === true || req.user._id === req.params.user) {
-    var user = await User.findOne({_id: req.params.user})
+    var user = await User.findOne({competition: req.competition, _id: req.params.user})
     if (user) {
       if (req.body.email) {
         if (/\S+@\S+\.\S+/.test(req.body.email)) user.email = req.body.email

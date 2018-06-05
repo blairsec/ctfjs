@@ -7,14 +7,7 @@ var schema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  challenges: [{
-    type: Number,
-    ref: 'Challenge'
-  }],
-  teams: [{
-    type: Number,
-    ref: 'Team'
-  }],
+  about: String,
   start: Date,
   end: Date
 }, {
@@ -27,5 +20,16 @@ var schema = new mongoose.Schema({
   }
 })
 schema.plugin(autoIncrement.plugin, { model: 'Competition', startAt: 1 })
+
+schema.virtual('users', {
+  ref: 'User',
+  localField: '_id',
+  foreignField: 'competition'
+})
+schema.virtual('teams', {
+  ref: 'Team',
+  localField: '_id',
+  foreignField: 'competition'
+})
 
 module.exports = mongoose.model('Competition', schema)

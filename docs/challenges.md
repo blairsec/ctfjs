@@ -2,7 +2,7 @@
 
 ## Get a list of challenges
 Gets a list of challenges.
-### `GET /challenges`
+### `GET /competitions/{id}/challenges`
 ### Responses
 
 |code|description|content|
@@ -11,7 +11,7 @@ Gets a list of challenges.
 
 ## Create a challenge :lock:
 Creates a challenge. Requires admin.
-### `POST /challenges`
+### `POST /competitions/{id}/challenges`
 ### Request Body
 
 |name|type|required|requirements|
@@ -34,7 +34,7 @@ Creates a challenge. Requires admin.
 
 ## Submit a flag :lock:
 Submits a flag for a challenge. Requires the user to be on a team.
-### `POST /challenges/{id}/submissions`
+### `POST /competitions/{id}/challenges/{id}/submissions`
 ### Request Body
 
 |name|type|required|requirements|
