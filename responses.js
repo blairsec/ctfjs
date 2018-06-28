@@ -75,7 +75,7 @@ function team (teamObject, self) {
     affiliation: teamObject.affiliation,
     created: teamObject.createdAt,
   }
-  try { response.score = teamObject.score } catch {}
+  try { response.score = teamObject.score } catch (e) {}
   if (teamObject.members) response.eligible = teamObject.members.reduce((teamEligible, member) => teamEligible && member.eligible, true)
   if (teamObject.members) response.members = teamObject.members.map(member => user(member))
   try { response.solves = teamObject.solves.map(solveObject => submission(solveObject)) } catch (e) {console.log(e)}
