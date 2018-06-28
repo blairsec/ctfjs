@@ -6,7 +6,7 @@ var responses = require('../responses')
 var Competition = require('../models/competition')
 var router = express.Router()
 
-var cache = require('apicache').middleware
+var cache = require('../cache')
 
 var { body, validationResult } = require('express-validator/check')
 
@@ -49,9 +49,8 @@ router.post('/', [
 })
 
 // get list of teams
-router.get('/', cache('30 seconds'), async (req, res, next) => {
-  var teams = await responses.populate(Team.find({competition: req.competition}), 'Scoreboard').exec()
-  res.json(teams.map(team => responses.team(team)))
+router.get('/', async (req, res) => {
+  res.json(cache.getTeamCache())
 })
 
 // get a team

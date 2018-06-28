@@ -3,21 +3,19 @@ var passport = require('passport')
 var User = require('../models/user')
 var Team = require('../models/team')
 var Challenge = require('../models/challenge')
+var Competition = require('../models/competition')
 var responses = require('../responses')
 var Submission = require('../models/submission')
 var router = express.Router()
 
-var cache = require('apicache').middleware
+var cache = require('../cache')
 
 var { body, validationResult } = require('express-validator/check')
 
 
 // get a list of challenges
-router.get('/', cache('30 seconds'), async (req, res, next) => {
-  passport.authenticate('jwt', { session: false }, async function (err, user) {
-    var challenges = await responses.populate(Challenge.find({ competition: req.competition })).exec()
-    res.json(challenges.map(challenge => responses.challenge(challenge, user && user.team ? challenge.solved(user.team._id) : null, user ? user.admin : false)))
-  })(req, res, next)
+router.get('/', async (req, res, next) => {
+  res.json(cache.getChallengeCache())
 })
 
 // create a challenge

@@ -14,6 +14,9 @@ module.exports = class CTF {
     var mongoose = require('mongoose')
     mongoose.connect(config.db_uri)
 
+    // load cache
+    require('./cache')
+
     // passport config
     var LocalStrategy = require('passport-local').Strategy
     var JwtStrategy = require('passport-jwt').Strategy
