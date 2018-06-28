@@ -39,6 +39,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), [
       about: req.body.about,
       name: req.body.name
     })
+    if (typeof req.body.teamSize === "number") competition.teamSize = req.body.teamSize
     var competition = await competition.save()
 
     res.sendStatus(201)
@@ -47,7 +48,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), [
   }
 })
 
-// modify a competition HAVNE"T IEMTSPALTHJIESTU
+// modify a competition
 router.patch('/:competition', passport.authenticate('jwt', { session: false }), [
   body('start').isISO8601(),
   body('end').isISO8601(),
@@ -61,10 +62,13 @@ router.patch('/:competition', passport.authenticate('jwt', { session: false }), 
     var errors = validationResult(req)
     errors = errors.array().map(e => e.param)
 
+    console.log(req.body.teamSize, typeof req.body.teamSize)
+
     if (req.body.start && errors.indexOf('start') === -1) competition.start = req.body.start
     if (req.body.end && errors.indexOf('end') === -1) competition.end = req.body.end
     if (req.body.about && errors.indexOf('about') === -1) competition.about = req.body.about
     if (req.body.name && errors.indexOf('name') === -1) competition.name = req.body.name
+    if (req.body.teamSize && typeof req.body.teamSize === "number") competition.teamSize = req.body.teamSize
     competition = await competition.save()
 
     res.sendStatus(204)

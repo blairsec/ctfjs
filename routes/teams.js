@@ -3,7 +3,10 @@ var passport = require('passport')
 var User = require('../models/user')
 var Team = require('../models/team')
 var responses = require('../responses')
+var Competition = require('../models/competition')
 var router = express.Router()
+
+var cache = require('apicache').middleware
 
 var { body, validationResult } = require('express-validator/check')
 
@@ -46,8 +49,8 @@ router.post('/', [
 })
 
 // get list of teams
-router.get('/', async (req, res, next) => {
-  var teams = await responses.populate(Team.find({competition: req.competition})).exec()
+router.get('/', cache('30 seconds'), async (req, res, next) => {
+  var teams = await responses.populate(Team.find({competition: req.competition}), 'Scoreboard').exec()
   res.json(teams.map(team => responses.team(team)))
 })
 
@@ -70,7 +73,15 @@ router.get('/:team', async (req, res, next) => {
 })
 
 // join a team
-router.patch('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.patch('/', [
+  body('name').isString().isLength({ min: 1 }),
+  body('passcode').isString().isLength({ min: 1 })
+], passport.authenticate('jwt', { session: false }), async (req, res) => {
+  // check if data was valid
+  var errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).json({message: 'invalid_values'})
+  }
   var team = await responses.populate(Team.findOne({ competition: req.competition, nameLower: req.body.name.toLowerCase() })).exec()
   if (team) {
     if (team.members.filter(member => member.id == req.user._id).length > 0) {
@@ -79,10 +90,14 @@ router.patch('/', passport.authenticate('jwt', { session: false }), async (req, 
     if (req.body.passcode != team.passcode) {
       return res.status(403).json({message: "incorrect_passcode"})
     }
+    var competition = await Competition.findOne({_id: req.competition})
+    if (competition.teamSize && team.members.length >= competition.teamSize) return res.status(403).json({message: "team_is_full"})
     var user = await User.findOne({ competition: req.competition, _id: req.user._id })
     user.team = team._id
     await user.save()
     res.sendStatus(204)
+  } else {
+    res.status(404).json({message: 'team_not_found'})
   }
 })
 

@@ -4,11 +4,15 @@ function _populate (type, parents, paths) {
   if (type === "Challenge") {
     if (parents.indexOf('Submission') === -1) { paths.push({path: 'submissions', populate: _populate("Submission", parents, [])}) }
   } else if (type === "Submission") {
-    if (parents.indexOf('User') === -1) { paths.push({ path: 'user', populate: _populate('User', parents, []) }) }
-    if (parents.indexOf('Team') === -1) { paths.push({ path: 'team', populate: _populate('Team', parents, []) }) }
-    if (parents.indexOf('Challenge') === -1) { paths.push({ path: 'challenge', populate: _populate('Challenge', parents, []) }) }
+    if ((parents[0] === 'Challenge' || parents[0] === 'Scoreboard') && parents.indexOf('User') === -1) { paths.push({ path: 'user', select: '_id username' }) }
+    else if (parents.indexOf('User') === -1) { paths.push({ path: 'user', populate: _populate('User', parents, []) }) }
+    if ((parents[0] === 'Challenge' || parents[0] === 'Scoreboard') && parents.indexOf('Team') === -1) { paths.push({ path: 'team', select: '_id name' }) }
+    else if (parents.indexOf('Team') === -1) { paths.push({ path: 'team', populate: _populate('Team', parents, []) }) }
+    if (parents[0] === 'Scoreboard' && parents.indexOf('Challenge') === -1) { paths.push({ path: 'challenge', select: '_id value flag' }) }
+    else if (parents.indexOf('Challenge') === -1) { paths.push({ path: 'challenge', populate: _populate('Challenge', parents, []) }) }
   } else if (type === 'Team') {
-    if (true) { paths.push({ path: 'members', populate: _populate('User', parents, []) }) }
+    if (parents[0] !== 'Scoreboard') { paths.push({ path: 'members', populate: _populate('User', parents, []) }) }
+    else { paths.push({ path: 'members', select: 'eligible _id' }) }
     if (true) { paths.push({ path: 'submissions', populate: _populate('Submission', parents, []) }) }
     if (parents.indexOf('Competition') === -1) { paths.push({ path: 'competition', populate: _populate('Competition', parents, []) }) }
   } else if (type === 'User') {
@@ -19,8 +23,8 @@ function _populate (type, parents, paths) {
   return paths
 }
 
-function populate (object, type, parent) {
-  var paths = _populate(object.model.modelName, [parent], [])
+function populate (object, parent) {
+  var paths = _populate(object.model.modelName, parent ? [parent] : [], [])
   for (var i = 0; i < paths.length; i++) {
     object.populate(paths[i])
   }
@@ -34,8 +38,7 @@ function challenge (challengeObject, solved, admin) {
     description: challengeObject.description,
     value: challengeObject.value,
     author: challengeObject.author,
-    category: challengeObject.category,
-    solved: solved ? solved : false
+    category: challengeObject.category
   }
   if (challengeObject.submissions) response.solves = challengeObject.submissions.map(submissionObject => submission(submissionObject))
   if (admin) response.flag = challengeObject.flag
@@ -48,7 +51,8 @@ function competition (competitionObject) {
     name: competitionObject.name,
     start: competitionObject.start,
     end: competitionObject.end,
-    about: competitionObject.about
+    about: competitionObject.about,
+    teamSize: competitionObject.teamSize
   }
   return response
 }
@@ -68,13 +72,13 @@ function team (teamObject, self) {
   var response = {
     id: teamObject._id,
     name: teamObject.name,
-    members: teamObject.members.map(member => user(member)),
-    eligible: teamObject.members.reduce((teamEligible, member) => teamEligible && member.eligible, true),
     affiliation: teamObject.affiliation,
     created: teamObject.createdAt,
-    score: teamObject.score,
-    solves: teamObject.solves.map(solveObject => submission(solveObject))
   }
+  try { response.score = teamObject.score } catch {}
+  if (teamObject.members) response.eligible = teamObject.members.reduce((teamEligible, member) => teamEligible && member.eligible, true)
+  if (teamObject.members) response.members = teamObject.members.map(member => user(member))
+  try { response.solves = teamObject.solves.map(solveObject => submission(solveObject)) } catch (e) {console.log(e)}
   if (self === true) response.passcode = teamObject.passcode
   return response
 }

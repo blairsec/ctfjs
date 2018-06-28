@@ -7,11 +7,13 @@ var responses = require('../responses')
 var Submission = require('../models/submission')
 var router = express.Router()
 
+var cache = require('apicache').middleware
+
 var { body, validationResult } = require('express-validator/check')
 
 
 // get a list of challenges
-router.get('/', async (req, res, next) => {
+router.get('/', cache('30 seconds'), async (req, res, next) => {
   passport.authenticate('jwt', { session: false }, async function (err, user) {
     var challenges = await responses.populate(Challenge.find({ competition: req.competition })).exec()
     res.json(challenges.map(challenge => responses.challenge(challenge, user && user.team ? challenge.solved(user.team._id) : null, user ? user.admin : false)))
@@ -54,7 +56,7 @@ router.post('/:id/submissions', passport.authenticate('jwt', { session: false })
   if (req.user.team) {
     try {
       var challenge = await responses.populate(Challenge.findOne({ competition: req.competition, _id: req.params.id })).exec()
-      var team = await responses.populate(Team.findOne({ competition: req.competition, _id: req.user.team })).exec()
+      var team = await responses.populate(Team.findOne({ competition: req.competition, _id: req.user.team._id })).exec()
       if (team.solves.map(solve => solve.challenge._id).indexOf(challenge._id) === -1) {
         var submission = new Submission({
           team: team._id,

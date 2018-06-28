@@ -9,7 +9,8 @@ var schema = new mongoose.Schema({
   },
   about: String,
   start: Date,
-  end: Date
+  end: Date,
+  teamSize: Number
 }, {
   timestamps: true,
   toObject: {

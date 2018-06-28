@@ -39,7 +39,7 @@ var schema = new mongoose.Schema({
 })
 schema.index({ email: 1, competition: 1 }, { unique: true })
 schema.plugin(autoIncrement.plugin, { model: 'User', startAt: 1 })
-schema.plugin(passportLocalMongoose, { usernameCaseInsensitive: true, usernameField: "usernameUnique" })
+schema.plugin(passportLocalMongoose, { usernameCaseInsensitive: true, usernameField: "usernameUnique", iterations: 100000, keylen: 32 })
 
 schema.virtual('submissions', {
   ref: 'Submission',
