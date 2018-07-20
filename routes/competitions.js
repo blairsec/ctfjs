@@ -1,21 +1,20 @@
 var express = require('express')
 var passport = require('passport')
 var Competition = require('../models/competition')
-var responses = require('../responses')
 var router = express.Router()
 
 var { body, validationResult } = require('express-validator/check')
 
 // get a list of competitions
 router.get('/', async function (req, res) {
-  var competitions = await Competition.find({})
-  res.json(competitions.map(competition => responses.competition(competition)))
+  var competitions = await Competition.findSerialized({})
+  res.json(competitions)
 })
 
 // get a competition by id
 router.get('/:competition', async function (req, res) {
-  var competition = await Competition.findOne({ _id: req.params.competition })
-  if (competition) { req.json(responses.competition(competition)) }
+  var competition = await Competition.findSerialized({ id: req.params.competition })
+  if (competition) { req.json(competition) }
   else { req.status(404).json({ message: 'competition_not_found' }) }
 })
 
@@ -34,8 +33,8 @@ router.post('/', passport.authenticate('jwt', { session: false }), [
     }
 
     var competition = await new Competition({
-      start: req.body.start,
-      end: req.body.end,
+      start: new Date(req.body.start),
+      end: new Date(req.body.end),
       about: req.body.about,
       name: req.body.name
     })
@@ -56,7 +55,7 @@ router.patch('/:competition', passport.authenticate('jwt', { session: false }), 
   body('name').isString().isLength({ min: 1 })
 ], async function (req, res) {
   if (req.user.admin) {
-    var competition = await Competition.findOne({ _id: req.params.competition })
+    var competition = await Competition.findOne({ id: req.params.competition })
     if (!competition) { return req.status(404).json({ message: 'competition_not_found' }) }
     // check if data was valid
     var errors = validationResult(req)
@@ -64,11 +63,11 @@ router.patch('/:competition', passport.authenticate('jwt', { session: false }), 
 
     console.log(req.body.teamSize, typeof req.body.teamSize)
 
-    if (req.body.start && errors.indexOf('start') === -1) competition.start = req.body.start
-    if (req.body.end && errors.indexOf('end') === -1) competition.end = req.body.end
+    if (req.body.start && errors.indexOf('start') === -1) competition.start = new Date(req.body.start)
+    if (req.body.end && errors.indexOf('end') === -1) competition.end = new Date(req.body.end)
     if (req.body.about && errors.indexOf('about') === -1) competition.about = req.body.about
     if (req.body.name && errors.indexOf('name') === -1) competition.name = req.body.name
-    if (req.body.teamSize && typeof req.body.teamSize === "number") competition.teamSize = req.body.teamSize
+    if (req.body.teamSize && typeof req.body.teamSize === "number") competition.teamSize = parseInt(req.body.teamSize)
     competition = await competition.save()
 
     res.sendStatus(204)
@@ -79,7 +78,7 @@ router.patch('/:competition', passport.authenticate('jwt', { session: false }), 
 
 router.delete('/:competition', passport.authenticate('jwt', { session: false }), async function (req, res) {
   if (req.user.admin) {
-    await Competition.deleteOne({ _id: req.params.competition })
+    await Competition.delete({ id: req.params.competition })
     res.sendStatus(204)
   } else {
     res.status(403).json({message: 'action_forbidden'})

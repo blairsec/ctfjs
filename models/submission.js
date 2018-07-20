@@ -1,43 +1,76 @@
-var mongoose = require('mongoose')
-var autoIncrement = require('mongoose-plugin-autoinc')
+var { db } = require('../db')
+var Model = require('./model')
 
-var schema = new mongoose.Schema({
-  challenge: {
-    type: Number,
-    ref: 'Challenge'
-  },
-  user: {
-    type: Number,
-    ref: 'User'
-  },
-  team: {
-    type: Number,
-    ref: 'Team'
-  },
-  competition: {
-    type: Number
-  },
-  content: String
-}, {
-  timestamps: true,
-  toObject: {
-    virtuals: true
-  },
-  toJSON: {
-    virtuals: true
-  }
-})
+class Submission extends Model {
 
-schema.methods.isValid = async function () {
-  var submission = await this.populate()
-  if (submission.content === submission.challenge.flag) {
-    return true
+  static get tableName () {
+    return 'submissions'
   }
-  return false
+
+  static get properties () {
+    return super.properties.concat([
+      {
+        name: 'challenge',
+        valid: challenge => typeof challenge === 'number',
+        required: true
+      }, {
+        name: 'user',
+        valid: user => typeof user === 'number',
+        required: true
+      }, {
+        name: 'team',
+        valid: team => typeof team === 'number',
+        required: true
+      }, {
+        name: 'competition',
+        valid: competition => typeof competition === 'number',
+        required: true
+      }, {
+        name: 'content',
+        valid: content => typeof content === 'string',
+        required: true
+      }
+    ])
+  }
+
+  static async findSerialized (properties, options) {
+    for (var prop in properties) {
+      properties['submissions.'+prop] = properties[prop]
+      delete properties[prop]
+    }
+
+    if (options === undefined) options = { team: true, user: true, challenge: true }
+    var query = db.select('submissions.id', 'submissions.created as time').from('submissions').where(properties)
+    if (options.challenge) query = query.select('challenges.id as _challenge__id', 'challenges.title as _challenge__title', 'challenges.category as _challenge__category', 'challenges.value as _challenge__value', 'challenges.author as _challenge__author').join('challenges', function () {
+      var on = this.on('challenges.id', 'submissions.challenge')
+      if (options.solved) on = on.andOn('challenges.flag', 'submissions.content')
+    })
+    if (options.user) query = query.select('users.id as _user__id', 'users.username as _user__username').leftJoin('users', 'users.id', 'submissions.user')
+    if (options.team) query = query.select('teams.id as _team__id', 'teams.name as _team__name', 'teams.affiliation as _team__affiliation').leftJoin('teams', 'teams.id', 'submissions.team')
+    var submissions = await query
+
+    // convert properties to objects (for users, teams, etc.)
+    for (var s = 0; s < submissions.length; s++) {
+      var sub = submissions[s]
+      for (var p in sub) {
+        if (p.indexOf('_') === 0 && p.indexOf('__') !== -1) {
+          p = p.slice(1).split('__')
+          if (sub[p[0]] === undefined) sub[p[0]] = {}
+          sub[p[0]][p[1]] = sub['_'+p[0]+'__'+p[1]]
+          delete sub['_'+p[0]+'__'+p[1]]
+        }
+      }
+    }
+
+    console.log(submissions)
+
+    return submissions
+  }
+
+  constructor (given) {
+    super(given)
+  }
+
 }
-schema.virtual('correct').get(function () {
-  return (this.content === this.challenge.flag)
-})
 
-schema.plugin(autoIncrement.plugin, { model: 'Submission', startAt: 1 })
-module.exports = mongoose.model('Submission', schema)
+module.exports = Submission

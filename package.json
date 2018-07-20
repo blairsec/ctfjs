@@ -27,12 +27,14 @@
     "express": "^4.16.3",
     "express-validator": "^5.2.0",
     "jsonwebtoken": "^8.2.1",
+    "knex": "^0.15.0",
     "mongoose": "^5.0.18",
     "mongoose-plugin-autoinc": "^1.1.9",
     "passport": "^0.4.0",
-    "passport-jwt": "^3.0.1",
+    "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^4.5.0",
+    "pg": "^7.4.3",
     "pm2": "^2.10.3"
   },
   "devDependencies": {}

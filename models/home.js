@@ -1,18 +1,29 @@
-var mongoose = require('mongoose')
-var autoIncrement = require('mongoose-plugin-autoinc')
+var { db } = require('../db')
+var Model = require('./model')
 
-var schema = new mongoose.Schema({
-  title: String,
-  content: String
-}, {
-  timestamps: true,
-  toObject: {
-    virtuals: true
-  },
-  toJSON: {
-    virtuals: true
-  }
-})
-schema.plugin(autoIncrement.plugin, { model: 'Home', startAt: 1 })
+class Home extends Model {
 
-module.exports = mongoose.model('Home', schema)
+	static get tableName () {
+		return 'home'
+	}
+
+	static get properties () {
+		return super.properties.concat([
+			{
+				name: 'title',
+				valid: title => typeof title === 'string'
+			},
+			{
+				name: 'content',
+				valid: content => typeof content === 'string'
+			}
+		])
+	}
+
+	constructor (given) {
+		super(given)
+	}
+
+}
+
+module.exports = Home

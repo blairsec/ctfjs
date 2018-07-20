@@ -2,7 +2,6 @@ var express = require('express')
 var passport = require('passport')
 var User = require('../models/user')
 var Team = require('../models/team')
-var responses = require('../responses')
 var jwt = require('jsonwebtoken')
 var router = express.Router()
 
@@ -15,41 +14,47 @@ router.post('/', [
   body('email').isEmail()
 ], async (req, res, next) => {
   passport.authenticate('jwt', { session: false }, async function (err, user) {
-    var admins = await User.find({ admin: true })
+    var admins = await User.findSerialized({ admin: true })
     if (req.user && req.user.admin === true || admins.length === 0) {
-      User.register(new User({
+      var user = new User({
         username: req.body.username,
-        usernameUnique: req.body.username,
         email: req.body.email,
         eligible: false,
-        admin: true
-      }), req.body.password, (err, user) => {
-        if (err) {
-          res.status(409).json({message: 'username_email_conflict'})
-        } else {
-          res.sendStatus(201)
-        }
+        admin: true,
+        password: req.body.password,
+        competition: 0
       })
+      try {
+        await user.save()
+        res.sendStatus(201)
+      } catch (error) {
+        console.log(error)
+        res.status(409).json({message: 'username_email_conflict'})
+      }
     }
   })(req, res, next)
 })
 
 // view admins
 router.get('/', async (req, res) => {
-  var admins = await responses.populate(User.find({ admin: true })).exec()
-  res.json(admins.map(user => responses.user(user)))
+  var admins = await User.findSerialized({ admin: true })
+  res.json(admins)
 })
 
 // view self
 router.get('/self', passport.authenticate('jwt', { session: false }), async (req, res) => {
-  if (req.user.admin === true) res.json(responses.user(req.user))
+  if (req.user.admin === true) res.json(await User.findOneSerialized({id: req.user.id}))
   else res.sendStatus(401)
 })
 
 // give authentication token
-router.post('/auth', passport.authenticate('local'), async (req, res) => {
-  var token = jwt.sign({id: req.user._id, admin: true}, req.jwt_secret)
-  res.cookie('token', token).json({ token: token })
+router.post('/auth', passport.authenticate('local', { session: false }), async (req, res) => {
+  if (req.user.admin === true) {
+    var token = jwt.sign({id: req.user.id, admin: true}, req.jwt_secret)
+    res.cookie('token', token).json({ token: token })
+  } else {
+    res.sendStatus(401)
+  }
 })
 
 module.exports = router

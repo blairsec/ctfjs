@@ -4,18 +4,16 @@ var User = require('../models/user')
 var Team = require('../models/team')
 var Challenge = require('../models/challenge')
 var Competition = require('../models/competition')
-var responses = require('../responses')
 var Submission = require('../models/submission')
 var router = express.Router()
-
-var cache = require('../cache')
 
 var { body, validationResult } = require('express-validator/check')
 
 
 // get a list of challenges
-router.get('/', async (req, res, next) => {
-  res.json(cache.getChallengeCache())
+router.get('/', async (req, res) => {
+  var challenges = await Challenge.findSerialized({competition: req.competition})
+  res.json(challenges)
 })
 
 // create a challenge
@@ -36,11 +34,11 @@ router.post('/', [
     var challenge = new Challenge({
       title: req.body.title,
       description: req.body.description,
-      value: req.body.value,
+      value: parseInt(req.body.value),
       author: req.body.author,
       flag: req.body.flag,
       category: req.body.category,
-      competition: req.competition
+      competition: parseInt(req.competition)
     })
     await challenge.save()
     res.sendStatus(201)
@@ -53,18 +51,18 @@ router.post('/', [
 router.post('/:id/submissions', passport.authenticate('jwt', { session: false }), async (req, res) => {
   if (req.user.team) {
     try {
-      var challenge = await responses.populate(Challenge.findOne({ competition: req.competition, _id: req.params.id })).exec()
-      var team = await responses.populate(Team.findOne({ competition: req.competition, _id: req.user.team._id })).exec()
-      if (team.solves.map(solve => solve.challenge._id).indexOf(challenge._id) === -1) {
+      var challenge = await Challenge.findOne({ competition: req.competition, id: req.params.id })
+      var team = await Team.findOneSerialized({ competition: req.competition, id: req.user.team })
+      if (team.solves.map(solve => solve.challenge.id).indexOf(challenge.id) === -1) {
         var submission = new Submission({
-          team: team._id,
-          user: req.user._id,
-          challenge: challenge._id,
+          team: team.id,
+          user: req.user.id,
+          challenge: challenge.id,
           content: req.body.flag,
           competition: req.competition
         })
         await submission.save()
-        submission = await responses.populate(Submission.findOne({ competition: req.competition, _id: submission._id })).exec()
+        submission = await Submission.findOne({ competition: req.competition, id: submission.id })
         res.json({ correct: submission.correct })
       } else {
         res.status(400).json({ message: 'challenge_already_solved' })
@@ -88,7 +86,7 @@ router.patch('/:id', [
   body('category').isString().isLength({ min: 1 })
 ], passport.authenticate('jwt', { session: false }), async (req, res) => {
   if (req.user.admin) {
-    var challenge = await Challenge.findOne({ competition: req.competition, _id: req.params.id })
+    var challenge = await Challenge.findOne({ competition: req.competition, id: req.params.id })
     if (!challenge) return res.status(404).json({message: 'challenge_not_found'})
 
     var errors = validationResult(req)
@@ -112,7 +110,7 @@ router.patch('/:id', [
 // delete a challenge
 router.delete('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
   if (req.user.admin) {
-    await Challenge.deleteOne({ _id: req.params.id })
+    await Challenge.delete({ id: req.params.id })
     res.sendStatus(204)
   } else {
     res.status(403).json({message: 'action_forbidden'})

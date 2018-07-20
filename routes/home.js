@@ -1,7 +1,6 @@
 var express = require('express')
 var passport = require('passport')
 var jwt = require('jsonwebtoken')
-var responses = require('../responses')
 var Home = require('../models/home')
 var router = express.Router()
 
@@ -9,8 +8,8 @@ var { body, validationResult } = require('express-validator/check')
 
 // get home page text
 router.get('/', async (req, res) => {
-  var home = await Home.findOne({})
-  if (home) return res.json(responses.home(home))
+  var home = await Home.findOneSerialized({})
+  if (home) return res.json(home)
   res.json({title: '', content: ''})
 })
 

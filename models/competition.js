@@ -1,36 +1,38 @@
-var mongoose = require('mongoose')
-var autoIncrement = require('mongoose-plugin-autoinc')
+var { db } = require('../db')
+var Model = require('./model')
 
-var schema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  about: String,
-  start: Date,
-  end: Date,
-  teamSize: Number
-}, {
-  timestamps: true,
-  toObject: {
-    virtuals: true
-  },
-  toJSON: {
-    virtuals: true
+class Competition extends Model {
+
+  static get tableName () {
+    return 'competitions'
   }
-})
-schema.plugin(autoIncrement.plugin, { model: 'Competition', startAt: 1 })
 
-schema.virtual('users', {
-  ref: 'User',
-  localField: '_id',
-  foreignField: 'competition'
-})
-schema.virtual('teams', {
-  ref: 'Team',
-  localField: '_id',
-  foreignField: 'competition'
-})
+  static get properties () {
+    return super.properties.concat([
+      {
+        name: 'name',
+        valid: name => typeof name === 'string',
+        required: true
+      }, {
+        name: 'about',
+        valid: about => typeof about === 'string'
+      }, {
+        name: 'start',
+        valid: start => start instanceof Date
+      }, {
+        name: 'end',
+        valid: end => end instanceof Date
+      }, {
+        name: 'teamSize',
+        valid: teamSize => typeof teamSize === 'number'
+      }
+    ])
+  }
 
-module.exports = mongoose.model('Competition', schema)
+  constructor (given) {
+    super(given)
+  }
+
+}
+
+module.exports = Competition

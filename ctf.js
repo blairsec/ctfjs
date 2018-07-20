@@ -6,16 +6,11 @@ module.exports = class CTF {
 
   constructor (config) {
     // db config
+    require('./db').init(config.db_uri)
     var User = require('./models/user')
     var Team = require('./models/team')
     var Competition = require('./models/competition')
     var Submission = require('./models/submission')
-
-    var mongoose = require('mongoose')
-    mongoose.connect(config.db_uri)
-
-    // load cache
-    require('./cache')
 
     // passport config
     var LocalStrategy = require('passport-local').Strategy
@@ -23,9 +18,15 @@ module.exports = class CTF {
     var User = require('./models/user')
     this.jwt_secret = config.jwt_secret
 
-    passport.use(new LocalStrategy(User.authenticate()))
-    passport.serializeUser(User.serializeUser())
-    passport.deserializeUser(User.deserializeUser())
+    passport.use(new LocalStrategy({ passReqToCallback: true }, function (req, username, password, done) {
+      User.findOne({ username: username, competition: req.competition }).then(function (user) {
+        if (user && user.authenticate(password)) {
+          return done(null, user)
+        } else {
+          return done(null, false)
+        }
+      })
+    }))
 
     passport.use(new JwtStrategy({
       jwtFromRequest: function (req) {
@@ -37,18 +38,19 @@ module.exports = class CTF {
       },
       secretOrKey: config.jwt_secret
     }, function (payload, done) {
-      var query = { _id: payload.id }
+      var query = { id: payload.id }
       if (payload.admin === true) query.admin = true
       if (payload.competition) query.competition = payload.competition
-      responses.populate(User.findOne(query)).exec(function (err, user) {
-        if (err) {
-          return done(err, false)
-        }
+      User.findOne(query).then(function (user) {
+        console.log(user)
         if (user) {
           return done(null, user)
         } else {
           return done(null, false)
         }
+      }).catch(function (err) {
+        console.log(err)
+        return done(err, false)
       })
     }))
 
@@ -87,9 +89,9 @@ module.exports = class CTF {
     var assignCompetition = async function (req, res, next) {
       req.competition = req.params.competition
       if (!isNaN(req.competition)) {
-        var competition = await Competition.findOne({ _id: req.competition })
+        var competition = await Competition.findOne({ id: req.competition })
       } else { var competition = undefined }
-      if (competition) { next() }
+      if (competition) { req.competition = parseInt(req.competition); next() }
       else { res.status(404).json({ message: 'competition_not_found' }) }
     }
     router.use('/competitions/:competition/auth', assignCompetition, authRouter)
@@ -97,7 +99,7 @@ module.exports = class CTF {
     router.use('/competitions/:competition/teams', assignCompetition, teamsRouter)
     router.use('/competitions/:competition/challenges', assignCompetition, challengesRouter)
     router.use('/competitions', competitionsRouter)
-    router.use('/admin', adminRouter)
+    router.use('/admin', function (req, res, next) { /* admin uses competition 0 */ req.competition = 0; next() }, adminRouter)
     router.use('/self', selfRouter)
     router.use('/home', homeRouter)
 

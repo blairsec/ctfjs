@@ -2,7 +2,6 @@ var express = require('express')
 var passport = require('passport')
 var User = require('../models/user')
 var Team = require('../models/team')
-var responses = require('../responses')
 var router = express.Router()
 
 var { body, validationResult } = require('express-validator/check')
@@ -19,26 +18,25 @@ router.post('/', [
   if (!errors.isEmpty()) {
     return res.status(400).json({message: 'invalid_values'})
   }
-  User.register(new User({
+  var user = new User({
     username: req.body.username,
-    usernameUnique: req.body.username + '_' + req.competition.toString(),
     email: req.body.email,
     eligible: req.body.eligible,
     competition: req.competition
-  }), req.body.password, (err, user) => {
-    if (err) {
-      res.status(409).json({message: 'username_email_conflict'})
-    } else {
-      res.sendStatus(201)
-    }
   })
+  user.password(req.body.password)
+  if (err) {
+    res.status(409).json({message: 'username_email_conflict'})
+  } else {
+    res.sendStatus(201)
+  }
 })
 
 // get a list of users
 router.get('/', async (req, res, next) => {
   passport.authenticate('jwt', { session: false }, async function (err, self) {
-    var users = await responses.populate(User.find({competition: req.competition})).exec()
-    res.json(users.map(user => responses.user(user, self && user.id === self.id, self.admin === true)))
+    var users = await User.findSerialized({competition: req.competition}, {emails: self.admin})
+    res.json(users)
   })(req, res, next)
 })
 
@@ -47,9 +45,8 @@ router.get('/:user', async (req, res, next) => {
   passport.authenticate('jwt', { session: false }, async function (err, self) {
     var user = self
     try {
-      //if (req.params.user !== 'self') user = await User.findOne({ _id: req.params.user }).populate({ path: 'team', populate: { path: 'members submissions', populate: { path: 'challenge', populate: { path: 'submissions' } } }, model: Team }).populate('submissions').exec()
-      if (req.params.user !== 'self') user = await responses.populate(User.findOne({ _id: req.params.user })).exec()
-      if (user) res.json(responses.user(user, self.id === user.id, user.admin === true))
+      if (req.params.user !== 'self') user = await User.findOneSerialized({ id: req.params.user })
+      if (user) res.json(user)
       else throw "user_not_found"
     } catch (err) {
       console.log(err)
@@ -60,10 +57,10 @@ router.get('/:user', async (req, res, next) => {
 
 // modify a user
 router.patch('/:user', passport.authenticate('jwt', { session: false }), async (req, res) => {
-  if (req.params.user === 'self') req.params.user = req.user._id
+  if (req.params.user === 'self') req.params.user = req.user.id
   req.params.user = parseInt(req.params.user)
-  if (req.user.admin === true || req.user._id === req.params.user) {
-    var user = await User.findOne({competition: req.competition, _id: req.params.user})
+  if (req.user.admin === true || req.user.id === req.params.user) {
+    var user = await User.findOne({competition: req.competition, id: req.params.user})
     if (user) {
       if (req.body.email) {
         if (/\S+@\S+\.\S+/.test(req.body.email)) user.email = req.body.email

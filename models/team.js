@@ -1,55 +1,75 @@
-var mongoose = require('mongoose')
-var autoIncrement = require('mongoose-plugin-autoinc')
+var { db } = require('../db')
+var Model = require('./model')
 
-var schema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  nameLower: {
-    type: String,
-    required: true,
-    lowercase: true,
-    trim: true
-  },
-  passcode: {
-    type: String,
-    required: true
-  },
-  competition: {
-    type: Number
-  },
-  affiliation: String
-}, {
-  timestamps: true,
-  toObject: {
-    virtuals: true
-  },
-  toJSON: {
-    virtuals: true
+var Submission = require('./submission')
+
+class Team extends Model {
+
+  static get tableName () {
+    return 'teams'
   }
-})
-schema.index({ nameLower: 1, competition: 1 }, { unique: true })
-schema.plugin(autoIncrement.plugin, { model: 'Team', startAt: 1 })
 
+  static get properties () {
+    return super.properties.concat([
+      {
+        name: 'name',
+        valid: name => typeof name === 'string',
+        required: true
+      }, {
+        name: 'passcode',
+        valid: passcode => typeof passcode === 'string',
+        required: true,
+        private: true
+      }, {
+        name: 'competition',
+        valid: competition => typeof competition === 'number',
+        required: true
+      }, {
+        name: 'affiliation',
+        valid: affiliation => typeof affiliation === 'string'
+      }
+    ])
+  }
 
-schema.virtual('members', {
-  ref: 'User',
-  localField: '_id',
-  foreignField: 'team'
-})
-schema.virtual('submissions', {
-  ref: 'Submission',
-  localField: '_id',
-  foreignField: 'team'
-})
+  static async findSerialized (properties) {
 
-schema.virtual('score').get(function () {
-  return this.submissions.filter(submission => submission.correct).reduce((current, submission) => submission.challenge.value+current, 0)
-})
-schema.virtual('solves').get(function () {
-  return this.submissions.filter(submission => submission.correct)
-})
+    // specify table name in properties
+    for (var prop in properties) {
+      properties['teams.'+prop] = properties[prop]
+      delete properties[prop]
+    }
 
-module.exports = mongoose.model('Team', schema)
+    var teams = db.select('teams.id', 'name', 'affiliation', 'teams.created', db.raw('bool_and(users.eligible) as eligible'), db.raw('sum(challenges.value) / count(DISTINCT users.id) as score')).max('submissions.created as lastSolve').from('teams').where(properties).leftJoin('submissions', 'teams.id', 'submissions.team').innerJoin('challenges', function () {
+      this.on('submissions.challenge', 'challenges.id').andOn('submissions.content', 'challenges.flag')
+    }).leftJoin('users', 'users.team', 'teams.id').groupBy('teams.id')
+    teams = await teams
+
+    for (var t = 0; t < teams.length; t++) {
+      teams[t].score = parseInt(teams[t].score)
+    }
+
+    return teams
+
+  }
+
+  static async findOneSerialized (properties) {
+
+    var User = require('./user')
+
+    var team = await this.findOne(properties)
+
+    team.solves = await Submission.findSerialized({ team: team.id }, { user: true, challenge: true, solved: true })
+
+    team.members = await User.findSerialized({ team: team.id })
+
+    return team
+
+  }
+
+  constructor (given) {
+    super(given)
+  }
+
+}
+
+module.exports = Team
