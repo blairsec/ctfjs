@@ -36,7 +36,7 @@ router.post('/', [
 // get a list of users
 router.get('/', async (req, res, next) => {
   passport.authenticate('jwt', { session: false }, async function (err, self) {
-    var users = await User.findSerialized({competition: req.competition}, {emails: self.admin})
+    var users = await User.findSerialized({competition: req.competition}, {emails: self.admin, teams: true})
     res.json(users)
   })(req, res, next)
 })
