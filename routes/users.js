@@ -18,17 +18,17 @@ router.post('/', [
   if (!errors.isEmpty()) {
     return res.status(400).json({message: 'invalid_values'})
   }
-  var user = new User({
-    username: req.body.username,
-    email: req.body.email,
-    eligible: req.body.eligible,
-    competition: req.competition,
-    password: req.body.password
-  })
-  if (err) {
-    res.status(409).json({message: 'username_email_conflict'})
-  } else {
+  try {
+    var user = new User({
+      username: req.body.username,
+      email: req.body.email,
+      eligible: req.body.eligible,
+      competition: req.competition,
+      password: req.body.password
+    })
     res.sendStatus(201)
+  } except (error) {
+    res.status(409).json({message: 'username_email_conflict'})
   }
 })
 
