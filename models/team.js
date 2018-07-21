@@ -62,7 +62,7 @@ class Team extends Model {
 
     team.solves = await Submission.findSerialized({ team: team.id }, { user: true, challenge: true, solved: true })
 
-    team.members = await User.findSerialized({ team: team.id })
+    team.members = await User.findSerialized({ team: team.id }, { teams: false })
 
     return team
 

@@ -87,6 +87,10 @@ class User extends Model {
 
   static async findSerialized (properties, options) {
 
+    if (options === undefined) options = {
+      teams: true
+    }
+
     for (var prop in properties) {
       properties['users.'+prop] = properties[prop]
       delete properties[prop]
@@ -94,7 +98,8 @@ class User extends Model {
 
     if (options === undefined) options = {}
 
-    var query = db.select('users.id', 'username', 'eligible', 'teams.id as _team__id', 'teams.name as _team__name')
+    var query = db.select('users.id', 'username', 'eligible')
+    if (options.teams === true) query = query.select('teams.id as _team__id', 'teams.name as _team__name')
     if (options.emails === true) query = query.select('email')
     query = query.from('users').leftJoin('teams', 'teams.id', 'users.team').where(properties)
 
