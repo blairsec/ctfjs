@@ -62,8 +62,6 @@ class Submission extends Model {
       }
     }
 
-    console.log(submissions)
-
     return submissions
   }
 

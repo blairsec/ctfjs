@@ -42,14 +42,12 @@ module.exports = class CTF {
       if (payload.admin === true) query.admin = true
       if (payload.competition) query.competition = payload.competition
       User.findOne(query).then(function (user) {
-        console.log(user)
         if (user) {
           return done(null, user)
         } else {
           return done(null, false)
         }
       }).catch(function (err) {
-        console.log(err)
         return done(err, false)
       })
     }))
