@@ -22,9 +22,9 @@ router.post('/', [
     username: req.body.username,
     email: req.body.email,
     eligible: req.body.eligible,
-    competition: req.competition
+    competition: req.competition,
+    password: req.body.password
   })
-  user.password(req.body.password)
   if (err) {
     res.status(409).json({message: 'username_email_conflict'})
   } else {
