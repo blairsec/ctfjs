@@ -27,7 +27,7 @@ router.post('/', [
       password: req.body.password
     })
     res.sendStatus(201)
-  } except (error) {
+  } catch (error) {
     res.status(409).json({message: 'username_email_conflict'})
   }
 })
