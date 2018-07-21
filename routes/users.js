@@ -26,6 +26,7 @@ router.post('/', [
       competition: req.competition,
       password: req.body.password
     })
+    await user.save()
     res.sendStatus(201)
   } catch (error) {
     res.status(409).json({message: 'username_email_conflict'})
