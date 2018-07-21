@@ -39,14 +39,14 @@ class Team extends Model {
       delete properties[prop]
     }
 
-    var teams = db.select('teams.id', 'name', 'affiliation', 'teams.created', db.raw('bool_and(users.eligible) as eligible'), db.raw('sum(challenges.value) / count(DISTINCT users.id) as score')).max('submissions.created as lastSolve').from('teams').where(properties).leftJoin('submissions', 'teams.id', 'submissions.team').leftJoin('challenges', function () {
-      this.on('submissions.challenge', 'challenges.id').andOn('submissions.content', 'challenges.flag')
+    var teams = db.select('teams.id', 'teams.name', 'affiliation', 'teams.created', db.raw('bool_and(users.eligible) as eligible'), db.raw('sum(challenges.value) / count(DISTINCT users.id) as score')).max('submissions.created as lastSolve').from('teams').where(properties).leftJoin('submissions', 'teams.id', 'submissions.team').leftJoin('competitions', 'competitions.id', 'teams.competition').leftJoin('challenges', function () {
+      this.on('submissions.challenge', 'challenges.id').andOn('submissions.content', 'challenges.flag').andOn('submissions.created', '<', 'competitions.end')
     }).leftJoin('users', 'users.team', 'teams.id').groupBy('teams.id')
     teams = await teams
 
     for (var t = 0; t < teams.length; t++) {
       if (teams[t].score === null) teams[t].score = 0
-      if (teams[t].lastSolve === null) teams[t].lastSolve = teams[t].created
+      if (teams[t].lastSolve === null) delete teams[t].lastSolve
       teams[t].score = parseInt(teams[t].score)
     }
 

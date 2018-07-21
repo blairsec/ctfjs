@@ -62,8 +62,7 @@ router.post('/:id/submissions', passport.authenticate('jwt', { session: false })
           competition: req.competition
         })
         await submission.save()
-        submission = await Submission.findOne({ competition: req.competition, id: submission.id })
-        res.json({ correct: submission.correct })
+        res.json({ correct: submission.content === challenge.flag })
       } else {
         res.status(400).json({ message: 'challenge_already_solved' })
       }
