@@ -43,6 +43,10 @@ class User extends Model {
         name: 'salt',
         valid: salt => typeof salt === 'string',
         private: true
+      }, {
+        name: 'iterations',
+        valid: iterations => typeof iterations === 'number' && iterations > 0,
+        private: true
       }
     ])
   }
@@ -50,13 +54,13 @@ class User extends Model {
   set password (password) {
 
     this.salt = crypto.randomBytes(32).toString('hex')
-    this.hash = crypto.pbkdf2Sync(password, this.salt, 100000, 32, 'sha256').toString('hex')
+    this.hash = crypto.pbkdf2Sync(password, this.salt, this.iterations, 32, 'sha256').toString('hex')
 
   }
 
   authenticate (password) {
 
-    var hash = crypto.pbkdf2Sync(password, this.salt, 100000, 32, 'sha256')
+    var hash = crypto.pbkdf2Sync(password, this.salt, this.iterations, 32, 'sha256')
     return crypto.timingSafeEqual(hash, Buffer.from(this.hash, 'hex'))
 
   }
