@@ -1,5 +1,4 @@
 var passport = require('passport')
-var responses = require('./responses')
 var url = require('url')
 
 module.exports = class CTF {
