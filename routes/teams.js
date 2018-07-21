@@ -77,7 +77,7 @@ router.patch('/', [
   if (!errors.isEmpty()) {
     return res.status(400).json({message: 'invalid_values'})
   }
-  var team = await Team.findOne({ competition: req.competition, name: req.body.name })
+  var team = await Team.findOneSerialized({ competition: req.competition, name: req.body.name })
   if (team) {
     if (team.members.filter(member => member.id == req.user.id).length > 0) {
       return res.status(403).json({message: "already_in_team"})
