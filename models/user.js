@@ -54,7 +54,7 @@ class User extends Model {
   set password (password) {
 
     this.salt = crypto.randomBytes(32).toString('hex')
-    this.hash = crypto.pbkdf2Sync(password, this.salt, this.iterations, 32, 'sha256').toString('hex')
+    this.hash = crypto.pbkdf2Sync(password, this.salt, this.iterations !== undefined ? this.iterations : 100000, 32, 'sha256').toString('hex')
 
   }
 
