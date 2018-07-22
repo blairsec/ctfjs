@@ -53,7 +53,7 @@ ctfjs start --help
 ```
 The username and password for the database can be included in the URI with the following format:
 ```
-mongodb://username:password@host:port/database
+postgresql://username:password@host:port/database
 ```
 
 ### Node Module
@@ -65,7 +65,7 @@ var app = express()
 
 var CTF = require('ctfjs')
 var ctf = new CTF({
-  db_uri: 'mongodb://localhost/ctfjs',
+  db_uri: 'postgresql://localhost/ctfjs',
   jwt_secret: 'secret key here'
 })
 
