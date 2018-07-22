@@ -46,6 +46,7 @@ Optional properties are returned as specified in the description or the route. I
 ### User
 
 #### Required Properties
+
 | name     | type     | description   |
 | -------- | -------- | ------------- |
 | id       | number   | user id       |
@@ -54,6 +55,7 @@ Optional properties are returned as specified in the description or the route. I
 | created  | ISO 8601 | creation time |
 
 #### Optional Properties
+
 | name  | type          | description                                        | default         |
 | ----- | ------------- | -------------------------------------------------- | --------------- |
 | team  | [team](#team) | user's team (if they have one)                     | yes             |
