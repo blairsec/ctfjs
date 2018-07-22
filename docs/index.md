@@ -46,19 +46,19 @@ Optional properties are returned as specified in the description or the route. I
 ### User
 
 #### Required Properties
-|name|type|description|
-|----|----|-----------|
-|id|number|user id|
-|username|string|username|
-|eligible|boolean|eligibility|
-|created|ISO 8601|creation time|
+| name     | type     | description   |
+| -------- | -------- | ------------- |
+| id       | number   | user id       |
+| username | string   | username      |
+| eligible | boolean  | eligibility   |
+| created  | ISO 8601 | creation time |
 
 #### Optional Properties
-|name|type|description|default|
-|----|----|-----------|-----------|
-|team|[team](#team)|user's team (if they have one)|yes|
-|admin|boolean|`true` if the user is an admin, otherwise not sent|see description|
-|email|string|user's email address|no|
+| name  | type          | description                                        | default         |
+| ----- | ------------- | -------------------------------------------------- | --------------- |
+| team  | [team](#team) | user's team (if they have one)                     | yes             |
+| admin | boolean       | `true` if the user is an admin, otherwise not sent | see description |
+| email | string        | user's email address                               | no              |
 
 ### User List
 
