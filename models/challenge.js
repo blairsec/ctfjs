@@ -35,7 +35,8 @@ class Challenge extends Model {
       }, {
         name: 'competition',
         valid: competition => typeof competition === 'number' && competition >= 0,
-        required: true
+        required: true,
+        private: true
       }
     ])
   }
@@ -49,7 +50,7 @@ class Challenge extends Model {
     }
 
     // get challenges and number of correct submissions for each
-    var challenges = await db.select('challenges.id', 'title', 'description', 'value', 'author', 'category', 'challenges.competition').count('submissions.id as solves').from('challenges').where(query).leftJoin('submissions', function () {
+    var challenges = await db.select('challenges.id', 'title', 'description', 'value', 'author', 'category').count('submissions.id as solves').from('challenges').where(query).leftJoin('submissions', function () {
       this.on('challenges.id', 'submissions.challenge').andOn('challenges.flag', 'submissions.content')
     }).groupBy('challenges.id')
 
@@ -59,6 +60,16 @@ class Challenge extends Model {
     }
     
     return challenges
+
+  }
+
+  static async findOneSerialized (query) {
+
+    var challenge = await super.findOneSerialized(query)
+
+    challenge.solves = await Submission.findSerialized({challenge: challenge.id}, {team: true, user: true, challenge: false})
+
+    return challenge
 
   }
 

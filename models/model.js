@@ -12,7 +12,8 @@ class Model {
         valid: created => created instanceof Date
       }, {
         name: 'updated',
-        valid: updated => updated instanceof Date
+        valid: updated => updated instanceof Date,
+        private: true
       }
     ]
   }

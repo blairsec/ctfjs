@@ -27,7 +27,7 @@ Gets a list of users.
 
 |code|description|content|
 |----|-----------|-------|
-|200|a list of users|array of [users](index.md#user)|
+|200|a list of users|[list of users](index.md#user-list), includes emails if request by admin|
 
 ## Get a user
 Gets a single user.

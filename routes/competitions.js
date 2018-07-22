@@ -76,6 +76,7 @@ router.patch('/:competition', passport.authenticate('jwt', { session: false }), 
   }
 })
 
+// delete a competition
 router.delete('/:competition', passport.authenticate('jwt', { session: false }), async function (req, res) {
   if (req.user.admin) {
     await Competition.delete({ id: req.params.competition })

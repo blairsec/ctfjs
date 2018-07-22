@@ -11,7 +11,7 @@ Creates and sends an authentication token.
 
 ### Responses
 
-|code|description|content|
-|----|-----------|-------|
-|200|return token and set token cookie|`{"token": <token>}`
-|401|authentication failed|none
+| code | description                       | content              |
+| ---- | --------------------------------- | -------------------- |
+| 200  | return token and set token cookie | `{"token": <token>}` |
+| 401  | authentication failed             | none                 |

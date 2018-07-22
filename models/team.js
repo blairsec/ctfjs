@@ -54,15 +54,19 @@ class Team extends Model {
 
   }
 
-  static async findOneSerialized (properties) {
+  static async findOneSerialized (properties, options) {
 
     var User = require('./user')
 
-    var team = await this.findOne(properties)
+    var team = await super.findOneSerialized(properties)
 
     team.solves = await Submission.findSerialized({ team: team.id }, { user: true, challenge: true, solved: true })
 
     team.members = await User.findSerialized({ team: team.id }, { teams: false })
+
+    team.eligible = team.members.map(m => m.eligible).reduce((a, b) => a && b, true)
+
+    if (options && options.passcode) team.passcode = (await this.findOne(properties)).passcode
 
     return team
 

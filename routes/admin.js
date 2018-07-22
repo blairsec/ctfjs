@@ -31,6 +31,8 @@ router.post('/', [
         console.log(error)
         res.status(409).json({message: 'username_email_conflict'})
       }
+    } else {
+      res.status(403).json({message: 'action_forbidden'})
     }
   })(req, res, next)
 })
@@ -39,12 +41,6 @@ router.post('/', [
 router.get('/', async (req, res) => {
   var admins = await User.findSerialized({ admin: true })
   res.json(admins)
-})
-
-// view self
-router.get('/self', passport.authenticate('jwt', { session: false }), async (req, res) => {
-  if (req.user.admin === true) res.json(await User.findOneSerialized({id: req.user.id}))
-  else res.sendStatus(401)
 })
 
 // give authentication token

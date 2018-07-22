@@ -78,7 +78,8 @@ class User extends Model {
     var serialized = {
       id: user.id,
       username: user.username,
-      eligible: user.eligible
+      eligible: user.eligible,
+      created: user.created
     }
 
     if (user.admin === true) serialized.admin = true
@@ -102,7 +103,7 @@ class User extends Model {
 
     if (options === undefined) options = {}
 
-    var query = db.select('users.id', 'username', 'eligible')
+    var query = db.select('users.id', 'username', 'eligible', 'users.created')
     if (options.teams === true) query = query.select('teams.id as _team__id', 'teams.name as _team__name')
     if (options.emails === true) query = query.select('email')
     query = query.from('users').leftJoin('teams', 'teams.id', 'users.team').where(properties)
