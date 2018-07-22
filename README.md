@@ -31,7 +31,7 @@ npm install express
 ```
 
 ## Deployment
-Remember that this is just a REST API and requires a front end to go with it. You will also need to have MongoDB running
+Remember that this is just a REST API and requires a front end to go with it. You will also need to have PostgreSQL running
 somewhere. Deployment will depend on whether you installed ctfjs as a command or as a module.
 
 ### Command
