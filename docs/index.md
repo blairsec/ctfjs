@@ -171,7 +171,12 @@ Optional properties are returned as specified in the description or the route. I
 | about    | string   | about the competition |
 | start    | ISO 8601 | start date            |
 | end      | ISO 8601 | end date              |
-| teamSize | number   | team size limit       |
+
+#### Optional Properties
+
+|name|type|description|default|
+|----|----|-----------|-------|
+|teamSize|number|team size limit|
 
 ### Competition List
 
@@ -185,4 +190,9 @@ Optional properties are returned as specified in the description or the route. I
 | about    | string   | about the competition |
 | start    | ISO 8601 | start date            |
 | end      | ISO 8601 | end date              |
-| teamSize | number   | team size limit       |
+
+#### Optional Properties
+
+|name|type|description|default|
+|----|----|-----------|-------|
+|teamSize|number|team size limit|
