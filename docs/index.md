@@ -176,7 +176,7 @@ Optional properties are returned as specified in the description or the route. I
 
 |name|type|description|default|
 |----|----|-----------|-------|
-|teamSize|number|team size limit|
+|teamSize|number|team size limit|if exists|
 
 ### Competition List
 
@@ -195,4 +195,4 @@ Optional properties are returned as specified in the description or the route. I
 
 |name|type|description|default|
 |----|----|-----------|-------|
-|teamSize|number|team size limit|
+|teamSize|number|team size limit|if exists|
