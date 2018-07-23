@@ -7,7 +7,7 @@ var path = require('path')
 
 var config = {
   jwt_secret: crypto.randomBytes(64).toString('hex'),
-  db_uri: 'mongodb://localhost/ctfjs',
+  db_uri: 'postgresql://ctf@localhost:5432/ctf',
   port: 3000,
 }
 

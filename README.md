@@ -46,8 +46,8 @@ To stop ctfjs, run:
 ctfjs stop
 ```
 
-By default ctfjs runs on port 3000 with a randomly generated secret key, and tries to use `localhost` for MongoDB. These 
-options can be changed with the arguments `-p` (port), `-s` (secret key), and `-d` (database URI).
+By default ctfjs runs on port 3000 with a randomly generated secret key, and tries to access the PostgresQL database `ctf` on `localhost:5432` with
+the user `ctf` and no password. These options can be changed with the arguments `-p` (port), `-s` (secret key), and `-d` (database URI).
 For more information run:
 ```
 ctfjs start --help
