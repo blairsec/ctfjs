@@ -20,6 +20,7 @@ Creates and joins a team.
 |409|team name conflict|`{"message": "team_name_conflict"}`|
 |403|user already on team|`{"message": "user_already_has_team"}`|
 |401|authentication failed|none|
+| 400  | invalid values        | `{"message": "invalid_values"}`   |
 
 ## Get a list of teams
 Gets a list of teams.
@@ -59,6 +60,7 @@ Joins a team.
 |403|incorrect passcode|`{"message": "incorrect_passcode"}`|
 |204|successfully joined team|none|
 |401|authentication failed|none|
+| 400  | invalid values        | `{"message": "invalid_values"}`   |
 
 ## Modify a team :lock:
 Modifies a team. Requires authentication.
@@ -81,3 +83,4 @@ User must either be an admin or modifying their own team.
 |404|team not found|`{"message": "team_not_found"}`|
 |403|user not permitted to modify team|`{"message": "action_forbidden"}`|
 |401|authentication failed|none|
+| 400  | invalid values        | `{"message": "invalid_values"}`   |

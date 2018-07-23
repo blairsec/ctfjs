@@ -10,7 +10,7 @@ var { body, validationResult } = require('express-validator/check')
 router.post('/', [
   body('username').isString().isLength({ min: 1 }),
   body('password').isLength({ min: 8 }),
-  body('email').isEmail(),
+  body('email').matches(/^\S+@\S+\.\S+$/),
   body('eligible').isBoolean()
 ], async (req, res) => {
   // check if data was valid
@@ -53,18 +53,23 @@ router.get('/:user', async (req, res, next) => {
 })
 
 // modify a user
-router.patch('/:user', passport.authenticate('jwt', { session: false }), async (req, res) => {
-  if (req.params.user === 'self') req.params.user = req.user.id
+router.patch('/:user', [
+  body('username').isString().isLength({ min: 1 }).optional(),
+  body('email').matches(/^\S+@\S+\.\S+$/).optional(),
+  body('eligible').isBoolean().optional()
+], passport.authenticate('jwt', { session: false }), async (req, res) => {
+  var errors = validationResult(req)
+  errors = errors.array().map(e => e.param)
+
+  if (errors.length > 0) return res.status(400).json({ message: 'invalid_values' })
+
   req.params.user = parseInt(req.params.user)
   if (req.user.admin === true || req.user.id === req.params.user) {
     var user = await User.findOne({competition: req.competition, id: req.params.user})
     if (user) {
-      if (req.body.email) {
-        if (/\S+@\S+\.\S+/.test(req.body.email)) user.email = req.body.email
-        else res.status(400).json({message: 'invalid_values'})
-      }
-      if (req.body.username) user.username = req.body.username
-      if (typeof req.body.eligible === 'boolean') user.eligible = req.body.eligible
+      if (req.body.email && errors.indexOf('email') === -1) { user.email = req.body.email }
+      if (req.body.username && errors.indexOf('username') === -1) user.username = req.body.username
+      if (req.body.eligible !== undefined && errors.indexOf('eligible') === -1) user.eligible = req.body.eligible
       try {
         await user.save()
         res.sendStatus(204)

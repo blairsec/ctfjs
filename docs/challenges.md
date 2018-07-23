@@ -60,6 +60,7 @@ Submits a flag for a challenge. Requires the user to be on a team.
 |404|challenge not found|`{"message": "challenge_not_found"}`|
 |403|user not on team|`{"message": "user_not_on_team"}`|
 |401|authentication failed|none|
+|400|invalid data provided|`{"message": "invalid_values"}`|
 
 ## Modify a challenge :lock:
 
@@ -85,6 +86,7 @@ Modify a challenge. Requires admin.
 | 204  | successfully modified | none                            |
 | 403  | action forbidden      | `{message: "action_forbidden"}` |
 | 401  | authentication failed | none                            |
+| 400  | invalid values        | `{"message": "invalid_values"}`   |
 
 ## Delete a challenge :lock:
 

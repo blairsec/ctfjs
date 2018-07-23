@@ -42,7 +42,6 @@ Gets a single user.
 ## Modify a user :lock:
 Modifies a user. Requires authentication.
 ### `PATCH /competitions/{id}/users/{id}`
-Note: `id` can be `self` to modify the currently authenticated user.
 
 The user must be either an admin or the user they are trying to modify.
 ### Request Body

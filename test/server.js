@@ -236,11 +236,25 @@ describe('Server Tests', function () {
 					.set('cookie', '_csrf=abc; token=' + adminAuth)
 					.send({
 						_csrf: 'abc',
-						about: 'this is for testing',
+						about: 'this is for testing!!!',
 						name: 'testing2',
 						teamSize: 2
 					})
-					.expect(204, done)
+					.expect(204)
+					.then(function () {
+						request(app)
+							.patch('/competitions/1')
+							.set('referer', 'https://angstromctf.com')
+							.set('host', 'angstromctf.com')
+							.set('cookie', '_csrf=abc; token=' + adminAuth)
+							.send({
+								_csrf: 'abc',
+								about: 'this is for testing'
+							})
+							.expect(204, done)
+					}).catch(function (error) {
+						done(error)
+					})
 			})
 			it('403 | does not allow modification if not admin', function (done) {
 				request(app)
@@ -463,7 +477,6 @@ describe('Server Tests', function () {
 					.set('cookie', '_csrf=abc; token=' + adminAuth)
 					.send({
 						_csrf: 'abc',
-						username: 'test6',
 						email: 'test6@test1.test1',
 						eligible: true
 					})
@@ -1067,14 +1080,28 @@ describe('Server Tests', function () {
 					.set('cookie', '_csrf=abc; token=' + adminAuth)
 					.send({
 						_csrf: 'abc',
-						title: 'test title 2',
+						title: 'test title 2!',
 						description: 'test description 2',
 						value: 2,
 						author: 'test author 2',
 						flag: 'test flag 2',
 						category: 'test category 2'
 					})
-					.expect(204, done)
+					.expect(204)
+					.then(function () {
+						request(app)
+							.patch('/competitions/2/challenges/1')
+							.set('referer', 'https://angstromctf.com')
+							.set('host', 'angstromctf.com')
+							.set('cookie', '_csrf=abc; token=' + adminAuth)
+							.send({
+								_csrf: 'abc',
+								title: 'test title 2'
+							})
+							.expect(204, done)
+					}).catch(function (error) {
+						done(error)
+					})
 			})
 			it('403 | does not allow modification when not admin', function (done) {
 				request(app)

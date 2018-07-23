@@ -73,6 +73,7 @@ Modifies a competition. Requires admin.
 | 204  | successfully modified | none                              |
 | 403  | action forbidden      | `{"message": "action_forbidden"}` |
 | 401  | authentication failed | none                              |
+| 400  | invalid values        | `{"message": "invalid_values"}`   |
 
 ## Delete a competition :lock:
 

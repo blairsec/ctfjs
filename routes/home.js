@@ -14,8 +14,8 @@ router.get('/', async (req, res) => {
 })
 
 router.put('/', [
-  body('title').isString(),
-  body('content').isString()
+  body('title').isString().isLength({ min: 1 }),
+  body('content').isString().isLength({ min: 1 })
 ], passport.authenticate('jwt', { session: false }), async (req, res) => {
   if (req.user.admin) {
     // check if data was valid

@@ -10,7 +10,8 @@ var { body, validationResult } = require('express-validator/check')
 // create + join team
 router.post('/', [
   body('name').isString().isLength({ min: 1 }),
-  body('passcode').isString().isLength({ min: 1 })
+  body('passcode').isString().isLength({ min: 1 }),
+  body('affiliation').isString().isLength({ min: 1 }).optional()
 ], passport.authenticate('jwt', { session: false }), async (req, res) => {
   // check if data was valid
   var errors = validationResult(req)
@@ -90,12 +91,18 @@ router.patch('/', [
 })
 
 // modify a team
-router.patch('/:team', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.patch('/:team', [
+  body('name').isString().isLength({ min: 1 }).optional(),
+  body('affiliation').isString().isLength({ min: 1 }).optional()
+], passport.authenticate('jwt', { session: false }), async (req, res) => {
   req.params.team = parseInt(req.params.team)
   req.user = await User.findOneSerialized({id: req.user.id})
   if (req.user.admin === true || req.user.team.id === req.params.team) {
     var team = await Team.findOne({ competition: req.competition, id: req.params.team })
     if (team) {
+      var errors = validationResult(req)
+      errors = errors.array().map(e => e.param)
+      if (errors.length > 0) return res.status(400).json({ message: 'invalid_values' })      
       if (req.body.name) team.name = req.body.name
       if (req.body.affiliation) team.affiliation = req.body.affiliation
       try {

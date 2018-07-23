@@ -54,8 +54,14 @@ router.post('/', [
 })
 
 // submit flag
-router.post('/:id/submissions', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/:id/submissions', [
+  body('flag').isString().isLength({ min: 1 })
+], passport.authenticate('jwt', { session: false }), async (req, res) => {
   if (req.user.team) {
+    var errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({message: 'invalid_values'})
+    }
     try {
       var challenge = await Challenge.findOne({ competition: req.competition, id: req.params.id })
       if (!challenge) throw "challenge not found"
@@ -83,12 +89,12 @@ router.post('/:id/submissions', passport.authenticate('jwt', { session: false })
 
 // modify a challenge
 router.patch('/:id', [
-  body('title').isString().isLength({ min: 1 }),
-  body('description').isString().isLength({ min: 1 }),
-  body('value').isNumeric(),
-  body('author').isString().isLength({ min: 1 }),
-  body('flag').isString().isLength({ min: 1 }),
-  body('category').isString().isLength({ min: 1 })
+  body('title').isString().isLength({ min: 1 }).optional(),
+  body('description').isString().isLength({ min: 1 }).optional(),
+  body('value').isNumeric().optional(),
+  body('author').isString().isLength({ min: 1 }).optional(),
+  body('flag').isString().isLength({ min: 1 }).optional(),
+  body('category').isString().isLength({ min: 1 }).optional()
 ], passport.authenticate('jwt', { session: false }), async (req, res) => {
   if (req.user.admin) {
     var challenge = await Challenge.findOne({ competition: req.competition, id: req.params.id })
@@ -96,6 +102,7 @@ router.patch('/:id', [
 
     var errors = validationResult(req)
     errors = errors.array().map(e => e.param)
+    if (errors.length > 0) return res.status(400).json({ message: 'invalid_values' })
 
     if (req.body.title && errors.indexOf('title') === -1) challenge.title = req.body.title
     if (req.body.description && errors.indexOf('description') === -1) challenge.description = req.body.description
