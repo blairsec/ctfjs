@@ -1,6 +1,7 @@
 # ctfjs
 [![npm](https://img.shields.io/npm/v/ctfjs.svg)](https://www.npmjs.com/package/ctfjs)
 [![Build Status](https://travis-ci.org/blairsec/ctfjs.svg?branch=master)](https://travis-ci.org/blairsec/ctfjs)
+
 ctfjs is a CTF (capture the flag) competition backend written in Node.js.
 
 It is still in development, and is not ready to be used to host an actual CTF.
