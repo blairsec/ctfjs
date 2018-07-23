@@ -11,3 +11,5 @@ var app = express()
 app.use(ctf.router)
 
 app.listen(process.env.PORT)
+
+module.exports = app

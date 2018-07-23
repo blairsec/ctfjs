@@ -24,6 +24,13 @@ class Home extends Model {
 		super(given)
 	}
 
+	static async findOneSerialized (properties) {
+		var home = await super.findOneSerialized(properties)
+		delete home.id
+		delete home.created
+		return home
+	}
+
 }
 
 module.exports = Home

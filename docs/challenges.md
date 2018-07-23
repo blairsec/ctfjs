@@ -7,7 +7,17 @@ Gets a list of challenges.
 
 |code|description|content|
 |----|-----------|-------|
-|200|a list of challenges|array of [challenges](index.md#challenge)|
+|200|a list of challenges|array of [challenges](index.md#challenge-list)|
+
+## Get a challenge
+Gets a single challenge.
+### `GET /competitions/{id}/challenges/{id}`
+### Responses
+
+|code|description|content|
+|----|-----------|-------|
+|200|the challenge|a [challenge](index.md#challenge)|
+|404|not found|`{"message": "challenge_not_found"}`|
 
 ## Create a challenge :lock:
 Creates a challenge. Requires admin.

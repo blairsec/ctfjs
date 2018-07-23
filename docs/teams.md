@@ -17,7 +17,7 @@ Creates and joins a team.
 |----|-----------|-------|
 |400|data validation failed|`{"message": "invalid_values"}`|
 |201|successfully created team|none|
-|409|team name conflict|`{"message": "team_already_exists"}`|
+|409|team name conflict|`{"message": "team_name_conflict"}`|
 |403|user already on team|`{"message": "user_already_has_team"}`|
 |401|authentication failed|none|
 
@@ -33,13 +33,11 @@ Gets a list of teams.
 ## Get a team
 Gets a single team.
 ### `GET /competitions/{id}/teams/{id}`
-Note: `id` can be `self` to get the current user's team
 ### Responses
 
 |code|description|content|
 |----|-----------|-------|
 |200|the team|a [team](index.md#team)|
-|401|user requested self, but isn't authenticated|none|
 |404|team not found|`{"message": "team_not_found"}`|
 
 ## Join a team :lock:
@@ -57,6 +55,7 @@ Joins a team.
 |code|description|content|
 |----|-----------|-------|
 |403|user already in team|`{"message": "already_in_team"}`|
+|403|user already has another team and competition has started|`{"message": "user_already_has_team"}`|
 |403|incorrect passcode|`{"message": "incorrect_passcode"}`|
 |204|successfully joined team|none|
 |401|authentication failed|none|
@@ -64,7 +63,6 @@ Joins a team.
 ## Modify a team :lock:
 Modifies a team. Requires authentication.
 ### `PATCH /competitions/{id}/teams/{id}`
-Note: `id` can be `self` to modify the current user's team.
 
 User must either be an admin or modifying their own team.
 ### Request Body

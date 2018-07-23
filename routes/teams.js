@@ -18,7 +18,7 @@ router.post('/', [
     return res.status(400).json({message: 'invalid_values'})
   }
   var user = req.user
-  if (!user.team) {
+  if (!user.team || new Date((await Competition.findOne({ id: req.competition })).start) > new Date()) {
     var team = new Team({
       name: req.body.name,
       passcode: req.body.passcode,
@@ -36,8 +36,7 @@ router.post('/', [
         res.sendStatus(500)
       }
     } catch (err) {
-      console.log(err)
-      res.status(409).json({message: 'team_already_exists'})
+      res.status(409).json({message: 'team_name_conflict'})
     }
   } else {
     res.status(403).json({message: 'user_already_has_team'})
@@ -51,20 +50,13 @@ router.get('/', async (req, res) => {
 
 // get a team
 router.get('/:team', async (req, res, next) => {
-  passport.authenticate('jwt', { session: false }, async function (err, user) {
-    try {
-      if (req.params.team !== 'self') team = await Team.findOneSerialized({ competition: req.competition, id: req.params.team })
-      else {
-        if (user === false) return res.sendStatus(401)
-        team = await Team.findOneSerialized({ competition: req.competition, id: user.team.id })
-      }
-      if (team) res.json(team)
-      else throw "team_not_found"
-    } catch (err) {
-      console.log(err)
-      res.status(404).json({message: 'team_not_found'})
-    }
-  })(req, res, next)
+  try {
+    team = await Team.findOneSerialized({ competition: req.competition, id: req.params.team })
+    if (team) res.json(team)
+    else throw "team_not_found"
+  } catch (err) {
+    res.status(404).json({message: 'team_not_found'})
+  }
 })
 
 // join a team
@@ -77,11 +69,12 @@ router.patch('/', [
   if (!errors.isEmpty()) {
     return res.status(400).json({message: 'invalid_values'})
   }
-  var team = await Team.findOneSerialized({ competition: req.competition, name: req.body.name })
+  var team = await Team.findOneSerialized({ competition: req.competition, name: req.body.name }, { passcode: true })
   if (team) {
     if (team.members.filter(member => member.id == req.user.id).length > 0) {
       return res.status(403).json({message: "already_in_team"})
     }
+    if (new Date((await Competition.findOne({ id: req.competition })).start) <= new Date() && req.user.team) return res.status(403).json({message: "user_already_has_team"})
     if (req.body.passcode != team.passcode) {
       return res.status(403).json({message: "incorrect_passcode"})
     }
@@ -98,8 +91,8 @@ router.patch('/', [
 
 // modify a team
 router.patch('/:team', passport.authenticate('jwt', { session: false }), async (req, res) => {
-  if (req.params.team === 'self') req.params.team = req.user.team
   req.params.team = parseInt(req.params.team)
+  req.user = await User.findOneSerialized({id: req.user.id})
   if (req.user.admin === true || req.user.team.id === req.params.team) {
     var team = await Team.findOne({ competition: req.competition, id: req.params.team })
     if (team) {

@@ -32,7 +32,6 @@ Gets a list of users.
 ## Get a user
 Gets a single user.
 ### `GET /competitions/{id}/users/{id}`
-Note: `id` can be `self` to get the currently authenticated user
 ### Responses
 
 |code|description|content|

@@ -29,7 +29,7 @@ Gets a competition by id.
 
 Creates a competition. Requires admin.
 
-### `POST /competitions/{id}`
+### `POST /competitions`
 
 ### Request Body
 

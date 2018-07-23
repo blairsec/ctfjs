@@ -65,9 +65,12 @@ class Challenge extends Model {
 
   static async findOneSerialized (query) {
 
+    var Submission = require('./submission')
     var challenge = await super.findOneSerialized(query)
 
-    challenge.solves = await Submission.findSerialized({challenge: challenge.id}, {team: true, user: true, challenge: false})
+    if (!challenge) return false
+
+    challenge.solves = await Submission.findSerialized({challenge: challenge.id}, {team: true, user: true, challenge: false, solved: true})
 
     return challenge
 

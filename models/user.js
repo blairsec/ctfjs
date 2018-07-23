@@ -75,6 +75,8 @@ class User extends Model {
 
     var user = await this.findOne(properties)
 
+    if (!user) return false
+
     var serialized = {
       id: user.id,
       username: user.username,
@@ -120,6 +122,13 @@ class User extends Model {
           sub[p[0]][p[1]] = sub['_'+p[0]+'__'+p[1]]
           delete sub['_'+p[0]+'__'+p[1]]
         }
+      }
+    }
+
+    // remove null teams
+    if (options.teams) {
+      for (var u = 0; u < users.length; u++) {
+        if (users[u].team.id === null) delete users[u].team
       }
     }
 

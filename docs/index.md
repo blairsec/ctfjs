@@ -58,7 +58,7 @@ Optional properties are returned as specified in the description or the route. I
 
 | name  | type          | description                                        | default         |
 | ----- | ------------- | -------------------------------------------------- | --------------- |
-| team  | [team](#team) | user's team (if they have one)                     | yes             |
+| team  | [team](#team) | user's team (if they have one)                     | if exists             |
 | admin | boolean       | `true` if the user is an admin, otherwise not sent | see description |
 | email | string        | user's email address                               | no              |
 
@@ -92,7 +92,7 @@ Optional properties are returned as specified in the description or the route. I
 | eligible    | boolean                                                      | whether all team members are eligible |
 | created     | ISO 8601                                                     | creation date                         |
 | solves      | [submission list](#submission-list) including user and challenge | correct submissions by team           |
-| members     | [user](#user) with team                                      | users on team                         |
+| members     | [user](#user) without team                                      | users on team                         |
 
 #### Optional Properties
 
@@ -111,7 +111,11 @@ Optional properties are returned as specified in the description or the route. I
 | affiliation | string   | team affiliation                          |
 | eligible    | boolean  | whether all team members are eligible     |
 | score       | number   | score of team prior to end of competition |
-| lastSolve   | ISO 8601 | date of last solve                        |
+| created     | ISO8601  | team creation date |
+
+|name|type|description|default|
+|----|----|-----------|-------|
+| lastSolve   | ISO 8601 | date of last solve |if exists|
 
 ### Submission List
 

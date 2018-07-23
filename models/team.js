@@ -23,7 +23,8 @@ class Team extends Model {
       }, {
         name: 'competition',
         valid: competition => typeof competition === 'number',
-        required: true
+        required: true,
+        private: true
       }, {
         name: 'affiliation',
         valid: affiliation => typeof affiliation === 'string'
@@ -47,6 +48,7 @@ class Team extends Model {
     for (var t = 0; t < teams.length; t++) {
       if (teams[t].score === null) teams[t].score = 0
       if (teams[t].lastSolve === null) delete teams[t].lastSolve
+      if (teams[t].eligible === null) teams[t].eligible = false
       teams[t].score = parseInt(teams[t].score)
     }
 
@@ -59,6 +61,8 @@ class Team extends Model {
     var User = require('./user')
 
     var team = await super.findOneSerialized(properties)
+
+    if (!team) return false
 
     team.solves = await Submission.findSerialized({ team: team.id }, { user: true, challenge: true, solved: true })
 

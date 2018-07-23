@@ -16,6 +16,12 @@ router.get('/', async (req, res) => {
   res.json(challenges)
 })
 
+router.get('/:id', async (req, res) => {
+  var challenge = await Challenge.findOneSerialized({id: req.params.id, competition: req.competition})
+  if (challenge) res.json(challenge)
+  else res.status(404).json({message: 'challenge_not_found'})
+})
+
 // create a challenge
 router.post('/', [
   body('title').isString().isLength({ min: 1 }),
@@ -52,6 +58,7 @@ router.post('/:id/submissions', passport.authenticate('jwt', { session: false })
   if (req.user.team) {
     try {
       var challenge = await Challenge.findOne({ competition: req.competition, id: req.params.id })
+      if (!challenge) throw "challenge not found"
       var team = await Team.findOneSerialized({ competition: req.competition, id: req.user.team })
       if (team.solves.map(solve => solve.challenge.id).indexOf(challenge.id) === -1) {
         var submission = new Submission({
@@ -67,7 +74,6 @@ router.post('/:id/submissions', passport.authenticate('jwt', { session: false })
         res.status(400).json({ message: 'challenge_already_solved' })
       }
     } catch (err) {
-      console.log(err)
       res.status(404).json({ message: 'challenge_not_found' })
     }
   } else {

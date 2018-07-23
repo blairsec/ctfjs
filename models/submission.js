@@ -41,7 +41,8 @@ class Submission extends Model {
 
     if (options === undefined) options = { team: true, user: true, challenge: true }
     var query = db.select('submissions.id', 'submissions.created as time').from('submissions').where(properties)
-    if (options.challenge) query = query.select('challenges.id as _challenge__id', 'challenges.title as _challenge__title', 'challenges.category as _challenge__category', 'challenges.value as _challenge__value', 'challenges.author as _challenge__author').join('challenges', function () {
+    if (options.challenge) query = query.select('challenges.id as _challenge__id', 'challenges.title as _challenge__title', 'challenges.category as _challenge__category', 'challenges.value as _challenge__value', 'challenges.author as _challenge__author')
+    query = query.join('challenges', function () {
       var on = this.on('challenges.id', 'submissions.challenge')
       if (options.solved) on = on.andOn('challenges.flag', 'submissions.content')
     })

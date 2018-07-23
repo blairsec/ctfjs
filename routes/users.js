@@ -43,17 +43,13 @@ router.get('/', async (req, res, next) => {
 
 // get info about a user
 router.get('/:user', async (req, res, next) => {
-  passport.authenticate('jwt', { session: false }, async function (err, self) {
-    var user = self
     try {
-      if (req.params.user !== 'self') user = await User.findOneSerialized({ id: req.params.user })
+      user = await User.findOneSerialized({ id: req.params.user, competition: req.competition })
       if (user) res.json(user)
       else throw "user_not_found"
     } catch (err) {
-      console.log(err)
       res.status(404).json({message: 'user_not_found'})
     }
-  })(req, res, next)
 })
 
 // modify a user
@@ -68,7 +64,7 @@ router.patch('/:user', passport.authenticate('jwt', { session: false }), async (
         else res.status(400).json({message: 'invalid_values'})
       }
       if (req.body.username) user.username = req.body.username
-      if (req.body.eligible) user.eligible = req.body.eligible
+      if (typeof req.body.eligible === 'boolean') user.eligible = req.body.eligible
       try {
         await user.save()
         res.sendStatus(204)
@@ -76,7 +72,7 @@ router.patch('/:user', passport.authenticate('jwt', { session: false }), async (
         res.status(409).json({message: 'username_email_conflict'})
       }
     } else {
-      req.status(404).json({message: 'user_not_found'})
+      res.status(404).json({message: 'user_not_found'})
     }
   } else {
     res.status(403).json({message: 'action_forbidden'})

@@ -15,7 +15,7 @@ router.post('/', [
 ], async (req, res, next) => {
   passport.authenticate('jwt', { session: false }, async function (err, user) {
     var admins = await User.findSerialized({ admin: true })
-    if (req.user && req.user.admin === true || admins.length === 0) {
+    if (user && user.admin === true || admins.length === 0) {
       var user = new User({
         username: req.body.username,
         email: req.body.email,
@@ -28,7 +28,6 @@ router.post('/', [
         await user.save()
         res.sendStatus(201)
       } catch (error) {
-        console.log(error)
         res.status(409).json({message: 'username_email_conflict'})
       }
     } else {
@@ -39,7 +38,7 @@ router.post('/', [
 
 // view admins
 router.get('/', async (req, res) => {
-  var admins = await User.findSerialized({ admin: true })
+  var admins = await User.findSerialized({ admin: true }, { team: false })
   res.json(admins)
 })
 

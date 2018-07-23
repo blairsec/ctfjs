@@ -106,6 +106,7 @@ class Model {
   // return one object serialiezd
   static async findOneSerialized (properties) {
     var object = await this.findOne(properties)
+    if (!object) return false
     var serialized = {}
     for (var p = 0; p < this.properties.length; p++) {
       if (!this.properties[p].private) {
