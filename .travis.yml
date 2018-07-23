@@ -3,4 +3,4 @@ node_js: "node"
 services:
   - postgresql
 before_script:
-  - psql -c 'CREATE ROLE ctf WITH SUPERUSER;' -U postgres
+  - psql -c 'CREATE USER ctf WITH SUPERUSER;' -U postgres
