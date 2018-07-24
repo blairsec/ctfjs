@@ -1,17 +1,26 @@
 var passport = require('passport')
 var url = require('url')
 
+var Competition = require('./models/competition')
+
 module.exports = class CTF {
 
   constructor (config) {
+    this._before = {}
+    this._after = {}
+
     // db config
-    require('./db').init(config.db_uri)
-    var User = require('./models/user')
-    var Team = require('./models/team')
-    var Competition = require('./models/competition')
-    var Submission = require('./models/submission')
+    require('./db').init(config.db_uri).then(function () { this.db = require('./db').db }.bind(this))
+    this.models = {}
+    var User = this.models.User = require('./models/user')
+    var Team = this.models.Team = require('./models/team')
+    var Competition = this.models.Competition = require('./models/competition')
+    var Submission = this.models.Submission = require('./models/submission')
+    var Challenge = this.models.Challenge = require('./models/challenge')
+    var Model = this.models.Model = require('./models/model')
 
     // passport config
+    this.passport = passport
     var LocalStrategy = require('passport-local').Strategy
     var JwtStrategy = require('passport-jwt').Strategy
     var User = require('./models/user')
@@ -57,14 +66,13 @@ module.exports = class CTF {
     var cookieParser = require('cookie-parser')
     var router = express.Router()
 
-    var usersRouter = require('./routes/users')
-    var authRouter = require('./routes/auth')
-    var teamsRouter = require('./routes/teams')
-    var challengesRouter = require('./routes/challenges')
-    var competitionsRouter = require('./routes/competitions')
-    var adminRouter = require('./routes/admin')
-    var selfRouter = require('./routes/self')
-    var homeRouter = require('./routes/home')
+    var usersRouter = require('./routes/users')(this)
+    var authRouter = require('./routes/auth')(this)
+    var teamsRouter = require('./routes/teams')(this)
+    var challengesRouter = require('./routes/challenges')(this)
+    var competitionsRouter = require('./routes/competitions')(this)
+    var adminRouter = require('./routes/admin')(this)
+    var selfRouter = require('./routes/self')(this)
 
     router.use(function (req, res, next) {
       req.jwt_secret = this.jwt_secret
@@ -83,22 +91,13 @@ module.exports = class CTF {
         res.status(400).json({message: "invalid_csrf"})
       }
     })
-    var assignCompetition = async function (req, res, next) {
-      req.competition = req.params.competition
-      if (!isNaN(req.competition)) {
-        var competition = await Competition.findOne({ id: req.competition })
-      } else { var competition = undefined }
-      if (competition) { req.competition = parseInt(req.competition); next() }
-      else { res.status(404).json({ message: 'competition_not_found' }) }
-    }
-    router.use('/competitions/:competition/auth', assignCompetition, authRouter)
-    router.use('/competitions/:competition/users', assignCompetition, usersRouter)
-    router.use('/competitions/:competition/teams', assignCompetition, teamsRouter)
-    router.use('/competitions/:competition/challenges', assignCompetition, challengesRouter)
+    router.use('/competitions/:competition/auth', this._assignCompetition, authRouter)
+    router.use('/competitions/:competition/users', this._assignCompetition, usersRouter)
+    router.use('/competitions/:competition/teams', this._assignCompetition, teamsRouter)
+    router.use('/competitions/:competition/challenges', this._assignCompetition, challengesRouter)
     router.use('/competitions', competitionsRouter)
     router.use('/admin', function (req, res, next) { /* admin uses competition 0 */ req.competition = 0; next() }, adminRouter)
     router.use('/self', selfRouter)
-    router.use('/home', homeRouter)
 
     router.use(function (err, req, res, next) {
       console.error(err.stack)
@@ -106,6 +105,59 @@ module.exports = class CTF {
     })
 
     this.router = router
+  }
+
+  async _assignCompetition (req, res, next) {
+    req.competition = req.params.competition
+    if (!isNaN(req.competition)) {
+      var competition = await Competition.findOne({ id: req.competition })
+    } else { var competition = undefined }
+    if (competition) { req.competition = parseInt(req.competition); next() }
+    else { res.status(404).json({ message: 'competition_not_found' }) }
+  }
+
+  addCompetitionRoute (path, ...middleware) {
+    this.router.use('/competitons/:competition' + path, this._assignCompetition, ...middleware)
+  }
+
+  addGlobalRoute (path, ...middleware) {
+    this.router.use(path, ...middleware)
+  }
+
+  before (event, func) {
+    if (this._before[event] === undefined) this._before[event] = []
+    this._before[event].push(func)
+  }
+
+  after (event, func) {
+    if (this._after[event] === undefined) this._after[event] = []
+    this._after[event].push(func)
+  }
+
+  unbindBefore (event, func) {
+    if (this._before[event] && this._before[event].indexOf(func) !== -1) {
+      this._before[event].splice(this._before[event].indexOf(func), 1)
+    }
+  }
+
+  unbindAfter (event, func) {
+    if (this._after[event] && this._after[event].indexOf(func) !== -1) {
+      this._after[event].splice(this._after[event].indexOf(func), 1)
+    }
+  }
+
+  async emitBefore (event, req, additionalProperties) {
+    if (this._before[event] === undefined) return
+    for (var i = 0; i < this._before[event].length; i++) {
+      await this._before[event][i](req, additionalProperties)
+    }
+  }
+
+  async emitAfter (event, req, additionalProperties) {
+    if (this._after[event] === undefined) return
+    for (var i = 0; i < this._after[event].length; i++) {
+      await this._after[event][i](req, additionalProperties)
+    }
   }
 
 }

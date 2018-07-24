@@ -1,5 +1,3 @@
-var { db } = require('../db')
-
 class Model {
 
   static get properties () {
@@ -18,9 +16,16 @@ class Model {
     ]
   }
 
+  static get db () {
+
+    return require('../db').db
+
+  }
+
   constructor (given) {
     // assign given properties if valid
     var valid = this.validate(given)
+    this.db = require('../db').db
     if (valid === true) Object.assign(this, given)
     else throw new Error(JSON.stringify(valid))
   }
@@ -77,12 +82,12 @@ class Model {
     if (valid === true) {
       if (this.id === undefined) {
         // create new object if no id yet
-        var object = (await db(this.constructor.tableName).insert(object, '*'))[0]
+        var object = (await this.db(this.constructor.tableName).insert(object, '*'))[0]
         Object.assign(this, object)
         return
       } else if (typeof this.id === 'number') {
         // update existing object if there is an id
-        await db(this.constructor.tableName).where('id', this.id).update(object)
+        await this.db(this.constructor.tableName).where('id', this.id).update(object)
         return
       } else {
         throw { type: 'ValidationError', reason: 'InvalidValue', property: 'id' }
@@ -95,7 +100,7 @@ class Model {
 
   // return one object matching properties
   static async findOne (properties) {
-    var users = await db(this.tableName).where(properties).limit(1)
+    var users = await this.db(this.tableName).where(properties).limit(1)
     if (users.length > 0) {
       return new (this)(users[0])
     } else {
@@ -125,7 +130,7 @@ class Model {
 
   // return all objects matching properties
   static async find (properties) {
-    return (await db(this.tableName).where(properties)).map(object => new (this)(object))
+    return (await this.db(this.tableName).where(properties)).map(object => new (this)(object))
   }
 
   // return objects serialized
@@ -155,7 +160,7 @@ class Model {
 
   // delete all objects matching properties
   static async delete (properties) {
-    await db(this.tableName).where(properties).del()
+    await this.db(this.tableName).where(properties).del()
   }
 
 }

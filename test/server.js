@@ -1316,47 +1316,6 @@ describe('Server Tests', function () {
 		})
 	})
 
-	describe('Home', function () {
-		describe('PUT /home', function () {
-			it('204 | creates home page', function (done) {
-				request(app)
-					.put('/home')
-					.set('referer', 'https://angstromctf.com')
-					.set('host', 'angstromctf.com')
-					.set('cookie', '_csrf=abc; token=' + adminAuth)
-					.send({
-						_csrf: 'abc',
-						title: 'home title',
-						content: 'home content'
-					})
-					.expect(204, done)
-			})
-			it('403 | does not allow creation if not admin', function (done) {
-				request(app)
-					.put('/home')
-					.set('referer', 'https://angstromctf.com')
-					.set('host', 'angstromctf.com')
-					.set('cookie', '_csrf=abc; token=' + userAuth[3])
-					.send({
-						_csrf: 'abc',
-						title: 'home title',
-						content: 'home content'
-					})
-					.expect(403, done)
-			})
-		})
-		describe('GET /home', function () {
-			it('200 | gets home page', function (done) {
-				request(app)
-					.get('/home')
-					.set('referer', 'https://angstromctf.com')
-					.set('host', 'angstromctf.com')
-					.expect(200)
-					.expect({title: 'home title', content: 'home content'}, done)
-			})
-		})
-	})
-
 	describe('Authorization', function () {
 		it('401 | PATCH /competitions/{id}/users/{id}', function (done) {
 			request(app)
@@ -1478,15 +1437,6 @@ describe('Server Tests', function () {
 		it('401 | DELETE /competitions/{id}', function (done) {
 			request(app)
 				.delete('/competitions/2')
-				.set('referer', 'https://angstromctf.com')
-				.set('host', 'angstromctf.com')
-				.set('cookie', '_csrf=abc')
-				.send({ _csrf: 'abc' })
-				.expect(401, done)
-		})
-		it('401 | PUT /home', function (done) {
-			request(app)
-				.put('/home')
 				.set('referer', 'https://angstromctf.com')
 				.set('host', 'angstromctf.com')
 				.set('cookie', '_csrf=abc')
