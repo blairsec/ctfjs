@@ -9,9 +9,9 @@ var { body, validationResult } = require('express-validator/check')
 
 // create + join team
 router.post('/', [
-  body('name').isString().isLength({ min: 1 }),
+  body('name').isString().trim().isLength({ min: 1 }),
   body('passcode').isString().isLength({ min: 1 }),
-  body('affiliation').isString().isLength({ min: 1 }).optional()
+  body('affiliation').isString().trim().isLength({ min: 1 }).optional()
 ], passport.authenticate('jwt', { session: false }), async (req, res) => {
   // check if data was valid
   var errors = validationResult(req)
@@ -62,7 +62,7 @@ router.get('/:team', async (req, res, next) => {
 
 // join a team
 router.patch('/', [
-  body('name').isString().isLength({ min: 1 }),
+  body('name').isString().trim().isLength({ min: 1 }),
   body('passcode').isString().isLength({ min: 1 })
 ], passport.authenticate('jwt', { session: false }), async (req, res) => {
   // check if data was valid
@@ -92,7 +92,7 @@ router.patch('/', [
 
 // modify a team
 router.patch('/:team', [
-  body('name').isString().isLength({ min: 1 }).optional(),
+  body('name').isString().trim().isLength({ min: 1 }).optional(),
   body('affiliation').isString().isLength({ min: 1 }).optional()
 ], passport.authenticate('jwt', { session: false }), async (req, res) => {
   req.params.team = parseInt(req.params.team)

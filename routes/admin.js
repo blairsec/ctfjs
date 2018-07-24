@@ -9,9 +9,9 @@ var { body, validationResult } = require('express-validator/check')
 
 // create an admin
 router.post('/', [
-  body('username').isString().isLength({ min: 1 }),
-  body('password').isLength({ min: 8 }),
-  body('email').matches(/^\S+@\S+\.\S+$/)
+  body('username').isString().trim().isLength({ min: 1 }),
+  body('password').isString().isLength({ min: 8 }),
+  body('email').isString().trim().matches(/^\S+@\S+\.\S+$/)
 ], async (req, res, next) => {
   passport.authenticate('jwt', { session: false }, async function (err, user) {
     var admins = await User.findSerialized({ admin: true })

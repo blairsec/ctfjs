@@ -34,8 +34,8 @@ describe('Server Tests', function () {
 					.set('host', 'angstromctf.com')
 					.set('cookie', '_csrf=abc')
 					.send({
-						'email': 'email@email.email',
-						'username': 'admin',
+						'email': '  email@email.email  ',
+						'username': ' admin   ',
 						'password': 'admin123',
 						'_csrf': 'abc'
 					})
@@ -58,7 +58,7 @@ describe('Server Tests', function () {
 			})
 		})
 		describe('GET /admin', function () {
-			it('200 | returns the created admin', function (done) {
+			it('200 | returns the created admin with trimmed email and username', function (done) {
 				request(app)
 					.get('/admin')
 					.set('referer', 'https://angstromctf.com')
@@ -350,8 +350,8 @@ describe('Server Tests', function () {
 					.set('cookie', '_csrf=abc')
 					.send({
 						_csrf: 'abc',
-						username: 'test2',
-						email: 'test2@test.test',
+						username: ' test2 	 ',
+						email: '    test2@test.test 	',
 						password: 'test1234',
 						eligible: true
 					})
@@ -413,7 +413,7 @@ describe('Server Tests', function () {
 			})
 		})
 		describe('POST /competitions/{id}/auth', function () {
-			it('200 | gets authentication tokens', function (done) {
+			it('200 | gets authentication tokens with trimmed username and email', function (done) {
 				request(app)
 					.post('/competitions/2/auth')
 					.set('referer', 'https://angstromctf.com')
@@ -664,7 +664,7 @@ describe('Server Tests', function () {
 					.set('host', 'angstromctf.com')
 					.set('cookie', '_csrf=abc; token=' + userAuth[3])
 					.send({
-						name: 'team1',
+						name: '   team1 			  ',
 						affiliation: 'testing team 1',
 						passcode: 'team1team1',
 						_csrf: 'abc'
@@ -857,7 +857,7 @@ describe('Server Tests', function () {
 			})
 		})
 		describe('GET /competitions/{id}/teams', function () {
-			it('200 | gets a list of teams', function (done) {
+			it('200 | gets a list of teams with trimmed team name', function (done) {
 				request(app)
 					.get('/competitions/2/teams')
 					.set('referer', 'https://angstromctf.com')

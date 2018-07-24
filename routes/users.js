@@ -8,9 +8,9 @@ var { body, validationResult } = require('express-validator/check')
 
 // register a user
 router.post('/', [
-  body('username').isString().isLength({ min: 1 }),
-  body('password').isLength({ min: 8 }),
-  body('email').matches(/^\S+@\S+\.\S+$/),
+  body('username').isString().trim().isLength({ min: 1 }),
+  body('password').isString().isLength({ min: 8 }),
+  body('email').isString().trim().matches(/^\S+@\S+\.\S+$/),
   body('eligible').isBoolean()
 ], async (req, res) => {
   // check if data was valid
@@ -54,8 +54,8 @@ router.get('/:user', async (req, res, next) => {
 
 // modify a user
 router.patch('/:user', [
-  body('username').isString().isLength({ min: 1 }).optional(),
-  body('email').matches(/^\S+@\S+\.\S+$/).optional(),
+  body('username').isString().trim().isLength({ min: 1 }).optional(),
+  body('email').isString().trim().matches(/^\S+@\S+\.\S+$/).optional(),
   body('eligible').isBoolean().optional()
 ], passport.authenticate('jwt', { session: false }), async (req, res) => {
   var errors = validationResult(req)
