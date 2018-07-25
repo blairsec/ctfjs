@@ -32,6 +32,7 @@ Creates a challenge. Requires admin.
 |author|string|yes|none|
 |flag|string|yes|none|
 |category|string|yes|none|
+|hint|string|no|none|
 
 ### Responses
 
@@ -78,6 +79,7 @@ Modify a challenge. Requires admin.
 | author      | string | no       | none         |
 | flag        | string | no       | none         |
 | category    | string | no       | none         |
+|hint|string|no|none|
 
 ### Responses
 

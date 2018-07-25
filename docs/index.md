@@ -149,6 +149,12 @@ Optional properties are returned as specified in the description or the route. I
 |created|ISO 8601|time of challenge creation|
 |solves|list of [submissions](#submission-list) without challenge|challenge solves|
 
+#### Optional Properties
+
+|name|type|description|default|
+|----|----|-----------|-------|
+|hint|string|challenge hint|if exists|
+
 ### Challenge List
 
 #### Required Properties
@@ -162,6 +168,12 @@ Optional properties are returned as specified in the description or the route. I
 | author      | string | challenge author      |
 | category    | string | challenge category    |
 | solves      | number | number of solves      |
+
+#### Optional Properties
+
+|name|type|description|default|
+|----|----|-----------|-------|
+|hint|string|challenge hint|if exists|
 
 ### Competition
 

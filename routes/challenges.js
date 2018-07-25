@@ -34,6 +34,7 @@ module.exports = function (ctf) {
     body('value').isNumeric(),
     body('author').isString().isLength({ min: 1 }),
     body('flag').isString().isLength({ min: 1 }),
+    body('hint').isString().isLength({ min: 1 }).optional(),
     body('category').isString().isLength({ min: 1 })
   ], passport.authenticate('jwt', { session: false }), async (req, res) => {
     if (req.user.admin) {
@@ -52,6 +53,7 @@ module.exports = function (ctf) {
         category: req.body.category,
         competition: parseInt(req.competition)
       })
+      if (req.body.hint) challenge.hint = req.body.hint
       await challenge.save()
       await ctf.emitAfter('createChallenge', req, { challenge: challenge })
       res.sendStatus(201)
@@ -103,7 +105,8 @@ module.exports = function (ctf) {
     body('value').isNumeric().optional(),
     body('author').isString().isLength({ min: 1 }).optional(),
     body('flag').isString().isLength({ min: 1 }).optional(),
-    body('category').isString().isLength({ min: 1 }).optional()
+    body('category').isString().isLength({ min: 1 }).optional(),
+    body('hint').isString().isLength({ min: 1 }).optional()
   ], passport.authenticate('jwt', { session: false }), async (req, res) => {
     if (req.user.admin) {
       await ctf.emitBefore('modifyChallenge', req)
@@ -120,6 +123,7 @@ module.exports = function (ctf) {
       if (req.body.author && errors.indexOf('author') === -1) challenge.author = req.body.author
       if (req.body.flag && errors.indexOf('flag') === -1) challenge.flag = req.body.flag
       if (req.body.category && errors.indexOf('category') === -1) challenge.category = req.body.category
+      if (req.body.hint && errors.indexOf('hint') === -1) challenge.hint = req.body.hint
 
       challenge = await challenge.save()
       await ctf.emitAfter('modifyChallenge', req, { challenge: challenge })

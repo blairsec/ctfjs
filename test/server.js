@@ -1030,7 +1030,8 @@ describe('Server Tests', function () {
 						value: 1,
 						author: 'test author',
 						flag: 'test flag',
-						category: 'test category'
+						category: 'test category',
+						hint: 'test hint'
 					})
 					.expect(201)
 					.then(function () {
@@ -1096,7 +1097,8 @@ describe('Server Tests', function () {
 					.then(function (response) {
 						assert.strictEqual(response.body.length, 3)
 						var challenge = response.body.filter(c => c.id === 1)[0]
-						assert.strictEqual(Object.keys(challenge).length, 7)
+						assert.strictEqual(response.body[2].hint, undefined)
+						assert.strictEqual(Object.keys(challenge).length, 8)
 						assert.strictEqual(challenge.id, 1)
 						assert.strictEqual(challenge.value, 1)
 						assert.strictEqual(challenge.title, 'test title')
@@ -1104,6 +1106,7 @@ describe('Server Tests', function () {
 						assert.strictEqual(challenge.author, 'test author')
 						assert.strictEqual(challenge.category, 'test category')
 						assert.strictEqual(challenge.solves, 0)
+						assert.strictEqual(challenge.hint, 'test hint')
 						done()
 					}).catch(function (error) {
 						done(error)
@@ -1124,7 +1127,8 @@ describe('Server Tests', function () {
 						value: 2,
 						author: 'test author 2',
 						flag: 'test flag 2',
-						category: 'test category 2'
+						category: 'test category 2',
+						hint: 'test hint 2'
 					})
 					.expect(204)
 					.then(function () {
@@ -1248,13 +1252,14 @@ describe('Server Tests', function () {
 					.set('host', 'angstromctf.com')
 					.expect(200)
 					.then(function (response) {
-						assert.strictEqual(Object.keys(response.body).length, 8)
+						assert.strictEqual(Object.keys(response.body).length, 9)
 						assert.strictEqual(response.body.id, 1)
 						assert.strictEqual(response.body.title, 'test title 2')
 						assert.strictEqual(response.body.value, 2)
 						assert.strictEqual(response.body.description, 'test description 2')
 						assert.strictEqual(response.body.author, 'test author 2')
 						assert.strictEqual(response.body.category, 'test category 2')
+						assert.strictEqual(response.body.hint, 'test hint 2')
 						assert.strictEqual(typeof response.body.created, 'string')
 						assert.strictEqual(response.body.solves.length, 1)
 						assert.strictEqual(response.body.solves[0].id, 2)
@@ -1266,6 +1271,20 @@ describe('Server Tests', function () {
 						assert.strictEqual(response.body.solves[0].user.id, 3)
 						assert.strictEqual(response.body.solves[0].user.username, 'test1')
 						assert.strictEqual(Object.keys(response.body.solves[0].user).length, 2)
+						done()
+					}).catch(function (error) {
+						done(error)
+					})
+			})
+			it('200 | does not show optional properties if not set', function () {
+				request(app)
+					.get('/competitions/2/challenges/2')
+					.set('referer', 'https://angstromctf.com')
+					.set('host', 'angstromctf.com')
+					.expect(200)
+					.then(function (response) {
+						assert.strictEqual(response.body.hint, undefined)
+						assert.strictEqual(Object.keys(response.body).length, 8)
 						done()
 					}).catch(function (error) {
 						done(error)

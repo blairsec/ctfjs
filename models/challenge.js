@@ -28,6 +28,9 @@ class Challenge extends Model {
         name: 'category',
         valid: category => typeof category === 'string'
       }, {
+        name: 'hint',
+        valid: hint => typeof hint === 'string'
+      }, {
         name: 'flag',
         valid: flag => typeof flag === 'string',
         required: true,
@@ -50,13 +53,14 @@ class Challenge extends Model {
     }
 
     // get challenges and number of correct submissions for each
-    var challenges = await db.select('challenges.id', 'title', 'description', 'value', 'author', 'category').count('submissions.id as solves').from('challenges').where(query).leftJoin('submissions', function () {
+    var challenges = await db.select('challenges.id', 'title', 'description', 'value', 'author', 'category', 'hint').count('submissions.id as solves').from('challenges').where(query).leftJoin('submissions', function () {
       this.on('challenges.id', 'submissions.challenge').andOn('challenges.flag', 'submissions.content')
     }).groupBy('challenges.id')
 
     // convert submissions to numbers
     for (var c = 0; c < challenges.length; c++) {
       challenges[c].solves = parseInt(challenges[c].solves)
+      if (challenges[c].hint === null) delete challenges[c].hint
     }
     
     return challenges
