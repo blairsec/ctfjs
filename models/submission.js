@@ -15,8 +15,7 @@ class Submission extends Model {
         required: true
       }, {
         name: 'user',
-        valid: user => typeof user === 'number',
-        required: true
+        valid: user => typeof user === 'number'
       }, {
         name: 'team',
         valid: team => typeof team === 'number',

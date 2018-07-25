@@ -96,7 +96,7 @@ module.exports = class CTF {
     router.use('/competitions/:competition/teams', this._assignCompetition, teamsRouter)
     router.use('/competitions/:competition/challenges', this._assignCompetition, challengesRouter)
     router.use('/competitions', competitionsRouter)
-    router.use('/admin', function (req, res, next) { /* admin uses competition 0 */ req.competition = 0; next() }, adminRouter)
+    router.use('/admin', function (req, res, next) { req.competition = null; next() }, adminRouter)
     router.use('/self', selfRouter)
 
     router.use(function (err, req, res, next) {

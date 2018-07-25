@@ -30,8 +30,7 @@ class User extends Model {
         valid: team => typeof team === 'number' && team >= 0
       }, {
         name: 'competition',
-        valid: competition => typeof competition === 'number' && competition >= 0,
-        required: true
+        valid: competition => typeof competition === 'number' && competition >= 0
       }, {
         name: 'admin',
         valid: admin => typeof admin === 'boolean'

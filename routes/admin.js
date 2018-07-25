@@ -24,7 +24,7 @@ module.exports = function (ctf) {
           eligible: false,
           admin: true,
           password: req.body.password,
-          competition: 0
+          competition: null
         })
         try {
           await user.save()

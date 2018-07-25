@@ -2,9 +2,9 @@ var assert = require('assert')
 var request = require('supertest')
 
 var app
+var db
 
 before(async function () {
-
 	var { Client } = require('pg')
 	var client = new Client('postgresql://ctf@localhost/template1')
 
@@ -17,6 +17,7 @@ before(async function () {
 	process.env.SECRET_KEY = 'secret_for_testing_only'
 	
 	await require('../db').init(process.env.DATABASE_URI)
+	db = require('../db').db
 	app = require('../index.js')
 })
 
@@ -1013,7 +1014,7 @@ describe('Server Tests', function () {
 
 	describe('Challenges', function () {
 		describe('POST /competitions/{id}/challenges', function () {
-			it('201 | creates a challenge', function (done) {
+			it('201 | creates challenges', function (done) {
 				request(app)
 					.post('/competitions/2/challenges')
 					.set('referer', 'https://angstromctf.com')
@@ -1028,7 +1029,41 @@ describe('Server Tests', function () {
 						flag: 'test flag',
 						category: 'test category'
 					})
-					.expect(201, done)
+					.expect(201)
+					.then(function () {
+						return request(app)
+							.post('/competitions/2/challenges')
+							.set('referer', 'https://angstromctf.com')
+							.set('host', 'angstromctf.com')
+							.set('cookie', '_csrf=abc; token=' + adminAuth)
+							.send({
+								_csrf: 'abc',
+								title: 'test title 2',
+								description: 'test description',
+								value: 1,
+								author: 'test author',
+								flag: 'test flag',
+								category: 'test category'
+							})
+							.expect(201)
+					})
+					.then(function () {
+						request(app)
+							.post('/competitions/2/challenges')
+							.set('referer', 'https://angstromctf.com')
+							.set('host', 'angstromctf.com')
+							.set('cookie', '_csrf=abc; token=' + adminAuth)
+							.send({
+								_csrf: 'abc',
+								title: 'test title 3',
+								description: 'test description',
+								value: 1,
+								author: 'test author',
+								flag: 'test flag',
+								category: 'test category'
+							})
+							.expect(201, done)
+					})
 			})
 			it('403 | cannot create a challenge if not admin', function (done) {
 				request(app)
@@ -1056,7 +1091,7 @@ describe('Server Tests', function () {
 					.set('host', 'angstromctf.com')
 					.expect(200)
 					.then(function (response) {
-						assert.strictEqual(response.body.length, 1)
+						assert.strictEqual(response.body.length, 3)
 						assert.strictEqual(Object.keys(response.body[0]).length, 7)
 						assert.strictEqual(response.body[0].id, 1)
 						assert.strictEqual(response.body[0].value, 1)
@@ -1146,7 +1181,20 @@ describe('Server Tests', function () {
 						flag: 'test flag 2'
 					})
 					.expect(200)
-					.expect({correct: true}, done)
+					.expect({correct: true})
+					.then(function () {
+						request(app)
+							.post('/competitions/2/challenges/2/submissions')
+							.set('referer', 'https://angstromctf.com')
+							.set('host', 'angstromctf.com')
+							.set('cookie', '_csrf=abc; token=' + userAuth[5])
+							.send({
+								_csrf: 'abc',
+								flag: 'test flag'
+							})
+							.expect(200)
+							.expect({correct: true}, done)
+					})
 			})
 			it('404 | returns not found if challenge doesn\'t exist', function (done) {
 				request(app)
@@ -1221,7 +1269,7 @@ describe('Server Tests', function () {
 			})
 			it('404 | returns challenge not found', function (done) {
 				request(app)
-					.get('/competitions/2/challenges/2')
+					.get('/competitions/2/challenges/4')
 					.set('referer', 'https://angstromctf.com')
 					.set('host', 'angstromctf.com')
 					.expect(404)
