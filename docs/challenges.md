@@ -1,7 +1,7 @@
 # Challenge routes
 
 ## Get a list of challenges
-Gets a list of challenges.
+Gets a list of challenges. Includes disabled challenges if admin.
 ### `GET /competitions/{id}/challenges`
 ### Responses
 
@@ -10,7 +10,7 @@ Gets a list of challenges.
 |200|a list of challenges|array of [challenges](index.md#challenge-list)|
 
 ## Get a challenge
-Gets a single challenge.
+Gets a single challenge. Returns 404 for disabled challenges unless admin.
 ### `GET /competitions/{id}/challenges/{id}`
 ### Responses
 
@@ -33,6 +33,7 @@ Creates a challenge. Requires admin.
 |flag|string|yes|none|
 |category|string|yes|none|
 |hint|string|no|none|
+|enabled|boolean|yes|none|
 
 ### Responses
 

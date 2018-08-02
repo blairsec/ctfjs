@@ -12,19 +12,27 @@ module.exports = function (ctf) {
 
 
   // get a list of challenges
-  router.get('/', async (req, res) => {
-    await ctf.emitBefore('getChallenges', req)
-    var challenges = await Challenge.findSerialized({competition: req.competition})
-    await ctf.emitAfter('getChallenges', req, { challenges: challenges })
-    res.json(challenges)
+  router.get('/', async (req, res, next) => {
+    passport.authenticate('jwt', { session: false }, async function (err, user) {
+      var options = {}
+      if (user && user.admin === true) options.showDisabled = true
+      await ctf.emitBefore('getChallenges', req)
+      var challenges = await Challenge.findSerialized({competition: req.competition}, options)
+      await ctf.emitAfter('getChallenges', req, { challenges: challenges })
+      res.json(challenges)
+    })(req, res, next)
   })
 
-  router.get('/:id', async (req, res) => {
-    await ctf.emitBefore('getChallenge', req)
-    var challenge = await Challenge.findOneSerialized({id: req.params.id, competition: req.competition})
-    await ctf.emitAfter('getChallenge', req, { challenge: challenge })
-    if (challenge) res.json(challenge)
-    else res.status(404).json({message: 'challenge_not_found'})
+  router.get('/:id', async (req, res, next) => {
+    passport.authenticate('jwt', { session: false }, async function (err, user) {
+      var options = {}
+      if (user && user.admin === true) options.showDisabled = true
+      await ctf.emitBefore('getChallenge', req)
+      var challenge = await Challenge.findOneSerialized({id: req.params.id, competition: req.competition}, options)
+      await ctf.emitAfter('getChallenge', req, { challenge: challenge })
+      if (challenge) res.json(challenge)
+      else res.status(404).json({message: 'challenge_not_found'})
+    })(req, res, next)
   })
 
   // create a challenge
@@ -35,7 +43,8 @@ module.exports = function (ctf) {
     body('author').isString().isLength({ min: 1 }),
     body('flag').isString().isLength({ min: 1 }),
     body('hint').isString().isLength({ min: 1 }).optional(),
-    body('category').isString().isLength({ min: 1 })
+    body('category').isString().isLength({ min: 1 }),
+    body('enabled').isBoolean()
   ], passport.authenticate('jwt', { session: false }), async (req, res) => {
     if (req.user.admin) {
       // check if data was valid
@@ -51,7 +60,8 @@ module.exports = function (ctf) {
         author: req.body.author,
         flag: req.body.flag,
         category: req.body.category,
-        competition: parseInt(req.competition)
+        competition: parseInt(req.competition),
+        enabled: req.body.enabled
       })
       if (req.body.hint) challenge.hint = req.body.hint
       await challenge.save()
@@ -73,7 +83,7 @@ module.exports = function (ctf) {
       }
       try {
         await ctf.emitBefore('submitFlag', req)
-        var challenge = await Challenge.findOne({ competition: req.competition, id: req.params.id })
+        var challenge = await Challenge.findOne({ competition: req.competition, id: req.params.id, enabled: true })
         if (!challenge) throw "challenge not found"
         var team = await Team.findOneSerialized({ competition: req.competition, id: req.user.team })
         if (team.solves.map(solve => solve.challenge.id).indexOf(challenge.id) === -1) {
@@ -106,7 +116,8 @@ module.exports = function (ctf) {
     body('author').isString().isLength({ min: 1 }).optional(),
     body('flag').isString().isLength({ min: 1 }).optional(),
     body('category').isString().isLength({ min: 1 }).optional(),
-    body('hint').isString().isLength({ min: 1 }).optional()
+    body('hint').isString().isLength({ min: 1 }).optional(),
+    body('enabled').isBoolean().optional()
   ], passport.authenticate('jwt', { session: false }), async (req, res) => {
     if (req.user.admin) {
       await ctf.emitBefore('modifyChallenge', req)
@@ -124,6 +135,7 @@ module.exports = function (ctf) {
       if (req.body.flag && errors.indexOf('flag') === -1) challenge.flag = req.body.flag
       if (req.body.category && errors.indexOf('category') === -1) challenge.category = req.body.category
       if (req.body.hint && errors.indexOf('hint') === -1) challenge.hint = req.body.hint
+      if (req.body.enabled !== undefined && errors.indexOf('enabled') === -1) challenge.enabled = req.body.enabled
 
       challenge = await challenge.save()
       await ctf.emitAfter('modifyChallenge', req, { challenge: challenge })

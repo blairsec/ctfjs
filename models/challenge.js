@@ -31,6 +31,10 @@ class Challenge extends Model {
         name: 'hint',
         valid: hint => typeof hint === 'string'
       }, {
+        name: 'enabled',
+        valid: enabled => typeof enabled === 'boolean',
+        required: true
+      }, {
         name: 'flag',
         valid: flag => typeof flag === 'string',
         required: true,
@@ -44,7 +48,12 @@ class Challenge extends Model {
     ])
   }
 
-  static async findSerialized (query) {
+  static async findSerialized (query, options) {
+
+    if (options === undefined) options = { showDisabled: false }
+
+    if (options.showDisabled === true) ;
+    else query['enabled'] = true
 
     // add challenges. to where fields
     for (var prop in query) {
@@ -53,7 +62,7 @@ class Challenge extends Model {
     }
 
     // get challenges and number of correct submissions for each
-    var challenges = await db.select('challenges.id', 'title', 'description', 'value', 'author', 'category', 'hint').count('submissions.id as solves').from('challenges').where(query).leftJoin('submissions', function () {
+    var challenges = await db.select('challenges.id', 'title', 'description', 'value', 'author', 'category', 'hint', 'enabled').count('submissions.id as solves').from('challenges').where(query).leftJoin('submissions', function () {
       this.on('challenges.id', 'submissions.challenge').andOn('challenges.flag', 'submissions.content')
     }).groupBy('challenges.id')
 
@@ -61,16 +70,24 @@ class Challenge extends Model {
     for (var c = 0; c < challenges.length; c++) {
       challenges[c].solves = parseInt(challenges[c].solves)
       if (challenges[c].hint === null) delete challenges[c].hint
+      if (options.showDisabled !== true) delete challenges[c].enabled
     }
     
     return challenges
 
   }
 
-  static async findOneSerialized (query) {
+  static async findOneSerialized (query, options) {
+
+    if (options === undefined) options = { showDisabled: false }
+
+    if (options.showDisabled === true) ;
+    else query['enabled'] = true
 
     var Submission = require('./submission')
     var challenge = await super.findOneSerialized(query)
+
+    if (!options.showDisabled) delete challenge.enabled
 
     if (!challenge) return false
 

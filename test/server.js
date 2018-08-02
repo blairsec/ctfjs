@@ -1031,7 +1031,8 @@ describe('Server Tests', function () {
 						author: 'test author',
 						flag: 'test flag',
 						category: 'test category',
-						hint: 'test hint'
+						hint: 'test hint',
+						enabled: true
 					})
 					.expect(201)
 					.then(function () {
@@ -1047,12 +1048,13 @@ describe('Server Tests', function () {
 								value: 1,
 								author: 'test author',
 								flag: 'test flag',
-								category: 'test category'
+								category: 'test category',
+								enabled: true
 							})
 							.expect(201)
 					})
 					.then(function () {
-						request(app)
+						return request(app)
 							.post('/competitions/2/challenges')
 							.set('referer', 'https://angstromctf.com')
 							.set('host', 'angstromctf.com')
@@ -1064,7 +1066,26 @@ describe('Server Tests', function () {
 								value: 1,
 								author: 'test author',
 								flag: 'test flag',
-								category: 'test category'
+								category: 'test category',
+								enabled: true
+							})
+							.expect(201)
+					}).then(function () {
+						request(app)
+							.post('/competitions/2/challenges')
+							.set('referer', 'https://angstromctf.com')
+							.set('host', 'angstromctf.com')
+							.set('cookie', '_csrf=abc; token=' + adminAuth)
+							.send({
+								_csrf: 'abc',
+								title: 'test title',
+								description: 'test description',
+								value: 1,
+								author: 'test author',
+								flag: 'test flag',
+								category: 'test category',
+								hint: 'test hint',
+								enabled: false
 							})
 							.expect(201, done)
 					})
@@ -1082,13 +1103,14 @@ describe('Server Tests', function () {
 						value: 1,
 						author: 'test author',
 						flag: 'test flag',
-						category: 'test category'
+						category: 'test category',
+						enabled: true
 					})
 					.expect(403, done)
 			})
 		})
 		describe('GET /competitions/{id}/challenges', function () {
-			it('200 | gets a list of challenges', function (done) {
+			it('200 | gets a list of enabled challenges', function (done) {
 				request(app)
 					.get('/competitions/2/challenges')
 					.set('referer', 'https://angstromctf.com')
@@ -1099,6 +1121,58 @@ describe('Server Tests', function () {
 						var challenge = response.body.filter(c => c.id === 1)[0]
 						assert.strictEqual(response.body[2].hint, undefined)
 						assert.strictEqual(Object.keys(challenge).length, 8)
+						assert.strictEqual(challenge.id, 1)
+						assert.strictEqual(challenge.value, 1)
+						assert.strictEqual(challenge.title, 'test title')
+						assert.strictEqual(challenge.description, 'test description')
+						assert.strictEqual(challenge.author, 'test author')
+						assert.strictEqual(challenge.category, 'test category')
+						assert.strictEqual(challenge.solves, 0)
+						assert.strictEqual(challenge.hint, 'test hint')
+						done()
+					}).catch(function (error) {
+						done(error)
+					})
+			})
+			it('200 | does not get disabled challenges if not admin', function (done) {
+				request(app)
+					.get('/competitions/2/challenges')
+					.set('referer', 'https://angstromctf.com')
+					.set('host', 'angstromctf.com')
+					.set('cookie', '_csrf=abc; token=' + userAuth[3])
+					.expect(200)
+					.then(function (response) {
+						assert.strictEqual(response.body.length, 3)
+						var challenge = response.body.filter(c => c.id === 1)[0]
+						assert.strictEqual(response.body[2].hint, undefined)
+						assert.strictEqual(Object.keys(challenge).length, 8)
+						assert.strictEqual(challenge.id, 1)
+						assert.strictEqual(challenge.value, 1)
+						assert.strictEqual(challenge.title, 'test title')
+						assert.strictEqual(challenge.description, 'test description')
+						assert.strictEqual(challenge.author, 'test author')
+						assert.strictEqual(challenge.category, 'test category')
+						assert.strictEqual(challenge.solves, 0)
+						assert.strictEqual(challenge.hint, 'test hint')
+						done()
+					}).catch(function (error) {
+						done(error)
+					})
+			})
+			it('200 | gets disabled challenges as well if admin', function (done) {
+				request(app)
+					.get('/competitions/2/challenges')
+					.set('referer', 'https://angstromctf.com')
+					.set('host', 'angstromctf.com')
+					.set('cookie', '_csrf=abc; token=' + adminAuth)
+					.expect(200)
+					.then(function (response) {
+						assert.strictEqual(response.body.length, 4)
+						var challenge = response.body.filter(c => c.id === 1)[0]
+						assert.strictEqual(response.body[2].hint, undefined)
+						assert.strictEqual(response.body.filter(c => c.id === 4)[0].enabled, false)
+						assert.strictEqual(Object.keys(challenge).length, 9)
+						assert.strictEqual(challenge.enabled, true)
 						assert.strictEqual(challenge.id, 1)
 						assert.strictEqual(challenge.value, 1)
 						assert.strictEqual(challenge.title, 'test title')
@@ -1132,7 +1206,7 @@ describe('Server Tests', function () {
 					})
 					.expect(204)
 					.then(function () {
-						request(app)
+						return request(app)
 							.patch('/competitions/2/challenges/1')
 							.set('referer', 'https://angstromctf.com')
 							.set('host', 'angstromctf.com')
@@ -1141,8 +1215,50 @@ describe('Server Tests', function () {
 								_csrf: 'abc',
 								title: 'test title 2'
 							})
-							.expect(204, done)
-					}).catch(function (error) {
+							.expect(204)
+					})
+					.then(function () {
+						return request(app)
+							.patch('/competitions/2/challenges/1')
+							.set('referer', 'https://angstromctf.com')
+							.set('host', 'angstromctf.com')
+							.set('cookie', '_csrf=abc; token=' + adminAuth)
+							.send({
+								enabled: false,
+								_csrf: 'abc'
+							})
+							.expect(204)
+					})
+					.then(function () {
+						return request(app)
+							.get('/competitions/2/challenges/1')
+							.set('referer', 'https://angstromctf.com')
+							.set('host', 'angstromctf.com')
+							.expect(404)
+					})
+					.then(function () {
+						return request(app)
+							.patch('/competitions/2/challenges/1')
+							.set('referer', 'https://angstromctf.com')
+							.set('host', 'angstromctf.com')
+							.set('cookie', '_csrf=abc; token=' + adminAuth)
+							.send({
+								enabled: true,
+								_csrf: 'abc'
+							})
+							.expect(204)
+					})
+					.then(function () {
+						return request(app)
+							.get('/competitions/2/challenges/1')
+							.set('referer', 'https://angstromctf.com')
+							.set('host', 'angstromctf.com')
+							.expect(200)
+							.then(function (response) {
+								done()
+							})
+					})
+					.catch(function (error) {
 						done(error)
 					})
 			})
@@ -1217,6 +1333,19 @@ describe('Server Tests', function () {
 					.expect(404)
 					.expect({message: 'challenge_not_found'}, done)
 			})
+			it('404 | returns not found for a disabled challenge', function (done) {
+				request(app)
+					.post('/competitions/2/challenges/4/submissions')
+					.set('referer', 'https://angstromctf.com')
+					.set('host', 'angstromctf.com')
+					.set('cookie', '_csrf=abc; token=' + userAuth[3])
+					.send({
+						_csrf: 'abc',
+						flag: 'test flag 2'
+					})
+					.expect(404)
+					.expect({message: 'challenge_not_found'}, done)
+			})
 			it('403 | cannot submit a flag if not on a team', function (done) {
 				request(app)
 					.post('/competitions/2/challenges/5/submissions')
@@ -1276,13 +1405,13 @@ describe('Server Tests', function () {
 						done(error)
 					})
 			})
-			it('200 | does not show optional properties if not set', function () {
+			it('200 | does not show optional properties if not set', function (done) {
 				request(app)
 					.get('/competitions/2/challenges/2')
 					.set('referer', 'https://angstromctf.com')
 					.set('host', 'angstromctf.com')
 					.expect(200)
-					.then(function (response) {
+					.then(function (response) { 
 						assert.strictEqual(response.body.hint, undefined)
 						assert.strictEqual(Object.keys(response.body).length, 8)
 						done()
@@ -1290,9 +1419,75 @@ describe('Server Tests', function () {
 						done(error)
 					})
 			})
-			it('404 | returns challenge not found', function (done) {
+			it('200 | shows enabled property if admin', function (done) {
+				request(app)
+					.get('/competitions/2/challenges/1')
+					.set('referer', 'https://angstromctf.com')
+					.set('host', 'angstromctf.com')
+					.set('cookie', 'token=' + adminAuth)
+					.expect(200)
+					.then(function (response) {
+						assert.strictEqual(Object.keys(response.body).length, 10)
+						assert.strictEqual(response.body.enabled, true)
+						assert.strictEqual(response.body.id, 1)
+						assert.strictEqual(response.body.title, 'test title 2')
+						assert.strictEqual(response.body.value, 2)
+						assert.strictEqual(response.body.description, 'test description 2')
+						assert.strictEqual(response.body.author, 'test author 2')
+						assert.strictEqual(response.body.category, 'test category 2')
+						assert.strictEqual(response.body.hint, 'test hint 2')
+						assert.strictEqual(typeof response.body.created, 'string')
+						assert.strictEqual(response.body.solves.length, 1)
+						assert.strictEqual(response.body.solves[0].id, 2)
+						assert.strictEqual(response.body.solves[0].team.id, 3)
+						assert.strictEqual(response.body.solves[0].team.name, 'edited name')
+						assert.strictEqual(response.body.solves[0].team.affiliation, 'edited affiliation')
+						assert.strictEqual(Object.keys(response.body.solves[0].team).length, 3)
+						assert.strictEqual(typeof response.body.solves[0].time, 'string')
+						assert.strictEqual(response.body.solves[0].user.id, 3)
+						assert.strictEqual(response.body.solves[0].user.username, 'test1')
+						assert.strictEqual(Object.keys(response.body.solves[0].user).length, 2)
+						done()
+					}).catch(function (error) {
+						done(error)
+					})
+			})
+			it('200 | gets disabled challenge if admin', function (done) {
 				request(app)
 					.get('/competitions/2/challenges/4')
+					.set('referer', 'https://angstromctf.com')
+					.set('host', 'angstromctf.com')
+					.set('cookie', 'token=' + adminAuth)
+					.expect(200)
+					.then(function (response) {
+						var challenge = response.body
+						assert.strictEqual(Object.keys(challenge).length, 10)
+						assert.strictEqual(challenge.id, 4)
+						assert.strictEqual(typeof challenge.created, 'string')
+						assert.strictEqual(challenge.enabled, false)
+						assert.strictEqual(challenge.value, 1)
+						assert.strictEqual(challenge.title, 'test title')
+						assert.strictEqual(challenge.description, 'test description')
+						assert.strictEqual(challenge.author, 'test author')
+						assert.strictEqual(challenge.category, 'test category')
+						assert.deepStrictEqual(challenge.solves, [])
+						assert.strictEqual(challenge.hint, 'test hint')
+						done()
+					}).catch(function (error) {
+						done(error)
+					})
+			})
+			it('404 | returns not found if disabled', function (done) {
+				request(app)
+					.get('/competitions/2/challenges/4')
+					.set('referer', 'https://angstromctf.com')
+					.set('host', 'angstromctf.com')
+					.expect(404)
+					.expect({message: 'challenge_not_found'}, done)
+			})
+			it('404 | returns challenge not found', function (done) {
+				request(app)
+					.get('/competitions/2/challenges/5')
 					.set('referer', 'https://angstromctf.com')
 					.set('host', 'angstromctf.com')
 					.expect(404)
