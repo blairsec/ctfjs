@@ -2,7 +2,6 @@ module.exports = function (ctf) {
   var express = require('express')
   var passport = require('passport')
   var User = require('../models/user')
-  var Team = require('../models/team')
   var router = express.Router()
 
   var { body, validationResult } = require('express-validator/check')
@@ -40,6 +39,7 @@ module.exports = function (ctf) {
   router.get('/', async (req, res, next) => {
     await ctf.emitBefore('getUsers', req)
     passport.authenticate('jwt', { session: false }, async function (err, self) {
+      if (err) throw err
       var users = await User.findSerialized({competition: req.competition}, {emails: self.admin, teams: true})
       await ctf.emitAfter('getUsers', req, { users: users })
       res.json(users)
@@ -49,14 +49,15 @@ module.exports = function (ctf) {
   // get info about a user
   router.get('/:user', async (req, res, next) => {
     await ctf.emitBefore('getUser', req)
-      try {
-        user = await User.findOneSerialized({ id: req.params.user, competition: req.competition })
-        await ctf.emitAfter('getUser', req, { user: user })
-        if (user) res.json(user)
-        else throw "user_not_found"
-      } catch (err) {
-        res.status(404).json({message: 'user_not_found'})
-      }
+    try {
+      var user = await User.findOneSerialized({ id: req.params.user, competition: req.competition })
+      await ctf.emitAfter('getUser', req, { user: user })
+      var userNotFoundError = 'user_not_found'
+      if (user) res.json(user)
+      else throw userNotFoundError
+    } catch (err) {
+      res.status(404).json({message: 'user_not_found'})
+    }
   })
 
   // modify a user

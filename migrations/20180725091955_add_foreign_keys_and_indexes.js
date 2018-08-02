@@ -1,6 +1,5 @@
 
-exports.up = function(knex, Promise) {
-
+exports.up = function (knex, Promise) {
   return knex.schema.table('teams', function (t) {
     t.foreign('competition').references('competitions.id').onDelete('SET NULL')
     t.index('competition')
@@ -30,11 +29,9 @@ exports.up = function(knex, Promise) {
       t.index('content')
     })
   })
+}
 
-};
-
-exports.down = function(knex, Promise) {
-  
+exports.down = function (knex, Promise) {
   return knex.schema.table('submissions', function (t) {
     t.dropForeign('competition')
     t.dropIndex('competition')
@@ -62,4 +59,4 @@ exports.down = function(knex, Promise) {
       t.dropIndex('competition')
     })
   })
-};
+}

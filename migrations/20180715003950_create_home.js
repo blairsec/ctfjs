@@ -1,6 +1,5 @@
 
-exports.up = function(knex) {
-
+exports.up = function (knex) {
   return knex.schema.createTable('home', t => {
     t.increments('id').unsigned().primary()
     t.timestamp('created')
@@ -8,11 +7,8 @@ exports.up = function(knex) {
     t.text('title')
     t.text('content')
   })
-
 }
 
-exports.down = function(knex) {
-  
+exports.down = function (knex) {
   return knex.schema.dropTable('home')
-
 }

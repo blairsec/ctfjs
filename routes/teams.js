@@ -32,7 +32,7 @@ module.exports = function (ctf) {
         await team.save()
         req.user.team = team.id
         try {
-          var user = await req.user.save()
+          await req.user.save()
           await ctf.emitAfter('createTeam', req, { team: team, user: user })
           res.sendStatus(201)
         } catch (err) {
@@ -61,8 +61,9 @@ module.exports = function (ctf) {
       await ctf.emitBefore('getTeam', req)
       var team = await Team.findOneSerialized({ competition: req.competition, id: req.params.team })
       await ctf.emitAfter('getTeam', req, { team: team })
+      var teamNotFoundError = 'team_not_found'
       if (team) res.json(team)
-      else throw "team_not_found"
+      else throw teamNotFoundError
     } catch (err) {
       if (err === 'team_not_found') res.status(404).json({message: 'team_not_found'})
       else throw err
@@ -82,15 +83,15 @@ module.exports = function (ctf) {
     await ctf.emitBefore('joinTeam', req)
     var team = await Team.findOneSerialized({ competition: req.competition, name: req.body.name }, { passcode: true })
     if (team) {
-      if (team.members.filter(member => member.id == req.user.id).length > 0) {
-        return res.status(403).json({message: "already_in_team"})
+      if (team.members.filter(member => member.id === req.user.id).length > 0) {
+        return res.status(403).json({message: 'already_in_team'})
       }
-      if (new Date((await Competition.findOne({ id: req.competition })).start) <= new Date() && req.user.team) return res.status(403).json({message: "user_already_has_team"})
-      if (req.body.passcode != team.passcode) {
-        return res.status(403).json({message: "incorrect_passcode"})
+      if (new Date((await Competition.findOne({ id: req.competition })).start) <= new Date() && req.user.team) return res.status(403).json({message: 'user_already_has_team'})
+      if (req.body.passcode !== team.passcode) {
+        return res.status(403).json({message: 'incorrect_passcode'})
       }
       var competition = await Competition.findOne({id: req.competition})
-      if (competition.teamSize && team.members.length >= competition.teamSize) return res.status(403).json({message: "team_is_full"})
+      if (competition.teamSize && team.members.length >= competition.teamSize) return res.status(403).json({message: 'team_is_full'})
       var user = await User.findOne({ competition: req.competition, id: req.user.id })
       user.team = team.id
       await user.save()
@@ -114,7 +115,7 @@ module.exports = function (ctf) {
       if (team) {
         var errors = validationResult(req)
         errors = errors.array().map(e => e.param)
-        if (errors.length > 0) return res.status(400).json({ message: 'invalid_values' })      
+        if (errors.length > 0) return res.status(400).json({ message: 'invalid_values' })
         if (req.body.name) team.name = req.body.name
         if (req.body.affiliation) team.affiliation = req.body.affiliation
         try {

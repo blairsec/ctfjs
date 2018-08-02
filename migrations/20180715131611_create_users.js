@@ -1,6 +1,5 @@
 
-exports.up = function(knex) {
-
+exports.up = function (knex) {
   return knex.schema.createTable('users', t => {
     t.increments('id').unsigned().primary()
     t.timestamp('created').defaultTo(knex.fn.now())
@@ -16,11 +15,8 @@ exports.up = function(knex) {
     t.unique(['username', 'competition'])
     t.unique(['email', 'competition'])
   })
-
 }
 
-exports.down = function(knex) {
-  
+exports.down = function (knex) {
   return knex.schema.dropTable('users')
-
 }

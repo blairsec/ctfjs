@@ -1,7 +1,6 @@
 module.exports = function (ctf) {
   var express = require('express')
   var passport = require('passport')
-  var jwt = require('jsonwebtoken')
   var router = express.Router()
 
   var Competition = require('../models/competition')

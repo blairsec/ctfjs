@@ -2,7 +2,6 @@ var { db } = require('../db')
 var Model = require('./model')
 
 class Challenge extends Model {
-
   static get tableName () {
     return 'challenges'
   }
@@ -49,7 +48,6 @@ class Challenge extends Model {
   }
 
   static async findSerialized (query, options) {
-
     if (options === undefined) options = { showDisabled: false }
 
     if (options.showDisabled === true) ;
@@ -57,7 +55,7 @@ class Challenge extends Model {
 
     // add challenges. to where fields
     for (var prop in query) {
-      query['challenges.'+prop] = query[prop]
+      query['challenges.' + prop] = query[prop]
       delete query[prop]
     }
 
@@ -72,13 +70,11 @@ class Challenge extends Model {
       if (challenges[c].hint === null) delete challenges[c].hint
       if (options.showDisabled !== true) delete challenges[c].enabled
     }
-    
-    return challenges
 
+    return challenges
   }
 
   static async findOneSerialized (query, options) {
-
     if (options === undefined) options = { showDisabled: false }
 
     if (options.showDisabled === true) ;
@@ -94,13 +90,7 @@ class Challenge extends Model {
     challenge.solves = await Submission.findSerialized({challenge: challenge.id}, {team: true, user: true, challenge: false, solved: true})
 
     return challenge
-
   }
-
-  constructor (given) {
-    super(given)
-  }
-
 }
- 
+
 module.exports = Challenge

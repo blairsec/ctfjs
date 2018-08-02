@@ -1,8 +1,6 @@
-var { db } = require('../db')
 var Model = require('./model')
 
 class Competition extends Model {
-
   static get tableName () {
     return 'competitions'
   }
@@ -28,11 +26,6 @@ class Competition extends Model {
       }
     ])
   }
-
-  constructor (given) {
-    super(given)
-  }
-
 }
 
 module.exports = Competition

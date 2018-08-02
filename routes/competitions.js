@@ -19,15 +19,14 @@ module.exports = function (ctf) {
     await ctf.emitBefore('getCompetition', req)
     var competition = await Competition.findOneSerialized({ id: req.params.competition })
     await ctf.emitAfter('getCompetition', req, { competition: competition })
-    if (competition) { res.json(competition) }
-    else { res.status(404).json({ message: 'competition_not_found' }) }
+    if (competition) { res.json(competition) } else { res.status(404).json({ message: 'competition_not_found' }) }
   })
 
   // create a competition
   router.post('/', passport.authenticate('jwt', { session: false }), [
     body('start').isISO8601(),
     body('end').isISO8601(),
-    body('about').isString().isLength({ min: 1}),
+    body('about').isString().isLength({ min: 1 }),
     body('name').isString().isLength({ min: 1 }),
     body('teamSize').isNumeric().optional()
   ], async function (req, res) {
@@ -46,7 +45,7 @@ module.exports = function (ctf) {
         name: req.body.name
       })
       if (typeof req.body.teamSize === 'number') competition.teamSize = req.body.teamSize
-      var competition = await competition.save()
+      await competition.save()
       await ctf.emitAfter('createCompetition', req, { competition: competition })
 
       res.sendStatus(201)

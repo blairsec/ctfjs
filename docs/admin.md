@@ -21,6 +21,7 @@ Creates an admin user. Can only be done by an admin or if no admins have been cr
 | 201  | successfully created admin | none                                   |
 | 409  | username or email conflict | `{"message": "username_email_conflict"}` |
 | 403  | action forbidden           | `{"message": "action_forbidden"}`          |
+| 400 | invalid values | `{"message": "invalid_values"}` |
 
 ## Get a list of admins
 

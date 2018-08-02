@@ -4,7 +4,6 @@ var url = require('url')
 var Competition = require('./models/competition')
 
 module.exports = class CTF {
-
   constructor (config) {
     this._before = {}
     this._after = {}
@@ -12,18 +11,18 @@ module.exports = class CTF {
     // db config
     require('./db').init(config.db_uri).then(function () { this.db = require('./db').db }.bind(this))
     this.models = {}
-    var User = this.models.User = require('./models/user')
-    var Team = this.models.Team = require('./models/team')
-    var Competition = this.models.Competition = require('./models/competition')
-    var Submission = this.models.Submission = require('./models/submission')
-    var Challenge = this.models.Challenge = require('./models/challenge')
-    var Model = this.models.Model = require('./models/model')
+    this.models.User = require('./models/user')
+    this.models.Team = require('./models/team')
+    this.models.Competition = require('./models/competition')
+    this.models.Submission = require('./models/submission')
+    this.models.Challenge = require('./models/challenge')
+    this.models.Model = require('./models/model')
 
     // passport config
     this.passport = passport
     var LocalStrategy = require('passport-local').Strategy
     var JwtStrategy = require('passport-jwt').Strategy
-    var User = require('./models/user')
+    var User = this.models.User
     this.jwt_secret = config.jwt_secret
 
     passport.use(new LocalStrategy({ passReqToCallback: true }, function (req, username, password, done) {
@@ -83,12 +82,12 @@ module.exports = class CTF {
     router.use(bodyParser.json())
     router.use(cookieParser())
     router.use(function (req, res, next) {
-      if (req.headers.referer && req.headers.host === url.parse(req.headers.referer).host && (req.method === "GET" || req.method === "HEAD" ||
+      if (req.headers.referer && req.headers.host === url.parse(req.headers.referer).host && (req.method === 'GET' || req.method === 'HEAD' ||
         (req.cookies && req.cookies._csrf && ((req.body && req.body._csrf && req.cookies._csrf === req.body._csrf) ||
         (req.query && req.query._csrf && req.cookies._csrf === req.query._csrf))))) {
         next()
       } else {
-        res.status(400).json({message: "invalid_csrf"})
+        res.status(400).json({message: 'invalid_csrf'})
       }
     })
     router.use('/competitions/:competition/auth', this._assignCompetition, authRouter)
@@ -108,12 +107,12 @@ module.exports = class CTF {
   }
 
   async _assignCompetition (req, res, next) {
+    var competition
     req.competition = req.params.competition
     if (!isNaN(req.competition)) {
-      var competition = await Competition.findOne({ id: req.competition })
-    } else { var competition = undefined }
-    if (competition) { req.competition = parseInt(req.competition); next() }
-    else { res.status(404).json({ message: 'competition_not_found' }) }
+      competition = await Competition.findOne({ id: req.competition })
+    } else { competition = undefined }
+    if (competition) { req.competition = parseInt(req.competition); next() } else { res.status(404).json({ message: 'competition_not_found' }) }
   }
 
   addCompetitionRoute (path, ...middleware) {
@@ -159,5 +158,4 @@ module.exports = class CTF {
       await this._after[event][i](req, additionalProperties)
     }
   }
-
 }

@@ -6,9 +6,8 @@ var crypto = require('crypto')
 var Team = require('./team')
 
 class User extends Model {
-
   static get tableName () {
-    return "users"
+    return 'users'
   }
 
   static get properties () {
@@ -51,17 +50,13 @@ class User extends Model {
   }
 
   set password (password) {
-
     this.salt = crypto.randomBytes(32).toString('hex')
     this.hash = crypto.pbkdf2Sync(password, this.salt, this.iterations !== undefined ? this.iterations : 100000, 32, 'sha256').toString('hex')
-
   }
 
   authenticate (password) {
-
     var hash = crypto.pbkdf2Sync(password, this.salt, this.iterations, 32, 'sha256')
     return crypto.timingSafeEqual(hash, Buffer.from(this.hash, 'hex'))
-
   }
 
   static async findOneSerialized (properties, options) {
@@ -88,17 +83,17 @@ class User extends Model {
     if (options.team === true && user.team) serialized.team = await Team.findOneSerialized({id: user.team})
 
     return serialized
-
   }
 
   static async findSerialized (properties, options) {
-
-    if (options === undefined) options = {
-      teams: true
+    if (options === undefined) {
+      options = {
+        teams: true
+      }
     }
 
     for (var prop in properties) {
-      properties['users.'+prop] = properties[prop]
+      properties['users.' + prop] = properties[prop]
       delete properties[prop]
     }
 
@@ -118,8 +113,8 @@ class User extends Model {
         if (p.indexOf('_') === 0 && p.indexOf('__') !== -1) {
           p = p.slice(1).split('__')
           if (sub[p[0]] === undefined) sub[p[0]] = {}
-          sub[p[0]][p[1]] = sub['_'+p[0]+'__'+p[1]]
-          delete sub['_'+p[0]+'__'+p[1]]
+          sub[p[0]][p[1]] = sub['_' + p[0] + '__' + p[1]]
+          delete sub['_' + p[0] + '__' + p[1]]
         }
       }
     }
@@ -132,11 +127,9 @@ class User extends Model {
     }
 
     return users
-
   }
 
   constructor (given) {
-
     var password = given.password
     delete given.password
 
@@ -144,10 +137,8 @@ class User extends Model {
 
     if (typeof password === 'string' && password.length > 0) {
       this.password = password
-    } 
-
+    }
   }
-
 }
 
 module.exports = User

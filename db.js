@@ -1,5 +1,6 @@
-class db {
-  
+var path = require('path')
+
+class DB {
   constructor () {
     this.db = null
   }
@@ -9,12 +10,11 @@ class db {
       client: 'pg',
       connection: uri,
       migrations: {
-        directory: __dirname+'/migrations'
+        directory: path.join(__dirname, '/migrations')
       }
     })
     await this.db.migrate.latest()
   }
-
 }
 
-module.exports = new db()
+module.exports = new DB()

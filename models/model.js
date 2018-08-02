@@ -1,5 +1,4 @@
 class Model {
-
   static get properties () {
     return [
       {
@@ -17,9 +16,7 @@ class Model {
   }
 
   static get db () {
-
     return require('../db').db
-
   }
 
   constructor (given) {
@@ -32,20 +29,20 @@ class Model {
 
   // validate properties
   validate (properties) {
-
     var propertyList = []
 
     // validate each property
-    for (var property in properties) { if (properties.hasOwnProperty(property)) {
-      if (properties[property] === null) continue
-      propertyList.push(property)
-      if (this.constructor.properties.map(p => p.name).indexOf(property) !== -1) {
-        if (this.constructor.properties.filter(p => p.name === property)[0].valid(properties[property])) {}
-        else return { type: 'ValidationError', reason: 'InvalidValue', property: property }
-      } else {
-        return { type: 'ValidationError', reason: 'InvalidProperty', property: property }
+    for (var property in properties) {
+      if (properties.hasOwnProperty(property)) {
+        if (properties[property] === null) continue
+        propertyList.push(property)
+        if (this.constructor.properties.map(p => p.name).indexOf(property) !== -1) {
+          if (this.constructor.properties.filter(p => p.name === property)[0].valid(properties[property])) {} else return { type: 'ValidationError', reason: 'InvalidValue', property: property }
+        } else {
+          return { type: 'ValidationError', reason: 'InvalidProperty', property: property }
+        }
       }
-    }}
+    }
 
     var requiredProperties = this.constructor.properties.filter(property => property.required)
 
@@ -59,7 +56,6 @@ class Model {
 
   // save properties to database
   async save () {
-
     var requiredProperties = this.constructor.properties.filter(property => property.required)
     var optionalProperties = this.constructor.properties.filter(property => !property.required)
 
@@ -73,7 +69,7 @@ class Model {
     }
 
     // add optional properties if they exist
-    for (var i = 0; i < optionalProperties.length; i++) {
+    for (i = 0; i < optionalProperties.length; i++) {
       if (this[optionalProperties[i].name] !== undefined) object[optionalProperties[i].name] = this[optionalProperties[i].name]
     }
 
@@ -82,20 +78,18 @@ class Model {
     if (valid === true) {
       if (this.id === undefined) {
         // create new object if no id yet
-        var object = (await this.db(this.constructor.tableName).insert(object, '*'))[0]
+        object = (await this.db(this.constructor.tableName).insert(object, '*'))[0]
         Object.assign(this, object)
-        return
       } else if (typeof this.id === 'number') {
         // update existing object if there is an id
         await this.db(this.constructor.tableName).where('id', this.id).update(object)
-        return
       } else {
-        throw { type: 'ValidationError', reason: 'InvalidValue', property: 'id' }
+        var error = { type: 'ValidationError', reason: 'InvalidValue', property: 'id' }
+        throw error
       }
     } else {
       throw valid
     }
-
   }
 
   // return one object matching properties
@@ -162,7 +156,6 @@ class Model {
   static async delete (properties) {
     await this.db(this.tableName).where(properties).del()
   }
-
 }
 
 module.exports = Model

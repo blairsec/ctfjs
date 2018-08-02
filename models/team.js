@@ -4,7 +4,6 @@ var Model = require('./model')
 var Submission = require('./submission')
 
 class Team extends Model {
-
   static get tableName () {
     return 'teams'
   }
@@ -33,10 +32,9 @@ class Team extends Model {
   }
 
   static async findSerialized (properties) {
-
     // specify table name in properties
     for (var prop in properties) {
-      properties['teams.'+prop] = properties[prop]
+      properties['teams.' + prop] = properties[prop]
       delete properties[prop]
     }
 
@@ -53,11 +51,9 @@ class Team extends Model {
     }
 
     return teams
-
   }
 
   static async findOneSerialized (properties, options) {
-
     var User = require('./user')
 
     var team = await super.findOneSerialized(properties)
@@ -73,13 +69,7 @@ class Team extends Model {
     if (options && options.passcode) team.passcode = (await this.findOne(properties)).passcode
 
     return team
-
   }
-
-  constructor (given) {
-    super(given)
-  }
-
 }
 
 module.exports = Team

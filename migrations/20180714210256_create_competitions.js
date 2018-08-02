@@ -1,6 +1,5 @@
 
-exports.up = function(knex) {
-
+exports.up = function (knex) {
   return knex.schema.createTable('competitions', t => {
     t.increments('id').unsigned().primary()
     t.timestamp('created')
@@ -11,11 +10,8 @@ exports.up = function(knex) {
     t.timestamp('end')
     t.integer('teamSize').unsigned()
   })
-
 }
 
-exports.down = function(knex) {
-  
+exports.down = function (knex) {
   return knex.schema.dropTable('competitions')
-
 }

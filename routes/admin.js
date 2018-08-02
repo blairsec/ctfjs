@@ -2,7 +2,6 @@ module.exports = function (ctf) {
   var express = require('express')
   var passport = require('passport')
   var User = require('../models/user')
-  var Team = require('../models/team')
   var jwt = require('jsonwebtoken')
   var router = express.Router()
 
@@ -15,10 +14,16 @@ module.exports = function (ctf) {
     body('email').isString().trim().matches(/^\S+@\S+\.\S+$/)
   ], async (req, res, next) => {
     passport.authenticate('jwt', { session: false }, async function (err, user) {
+      if (err) throw err
+      // check if data was valid
+      var errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        return res.status(400).json({message: 'invalid_values'})
+      }
       var admins = await User.findSerialized({ admin: true })
-      if (user && user.admin === true || admins.length === 0) {
+      if ((user && user.admin === true) || admins.length === 0) {
         await ctf.emitBefore('createAdmin', req, { currentUser: user })
-        var user = new User({
+        user = new User({
           username: req.body.username,
           email: req.body.email,
           eligible: false,

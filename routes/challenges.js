@@ -1,19 +1,17 @@
 module.exports = function (ctf) {
   var express = require('express')
   var passport = require('passport')
-  var User = require('../models/user')
   var Team = require('../models/team')
   var Challenge = require('../models/challenge')
-  var Competition = require('../models/competition')
   var Submission = require('../models/submission')
   var router = express.Router()
 
   var { body, validationResult } = require('express-validator/check')
 
-
   // get a list of challenges
   router.get('/', async (req, res, next) => {
     passport.authenticate('jwt', { session: false }, async function (err, user) {
+      if (err) throw err
       var options = {}
       if (user && user.admin === true) options.showDisabled = true
       await ctf.emitBefore('getChallenges', req)
@@ -25,6 +23,7 @@ module.exports = function (ctf) {
 
   router.get('/:id', async (req, res, next) => {
     passport.authenticate('jwt', { session: false }, async function (err, user) {
+      if (err) throw err
       var options = {}
       if (user && user.admin === true) options.showDisabled = true
       await ctf.emitBefore('getChallenge', req)
@@ -84,7 +83,8 @@ module.exports = function (ctf) {
       try {
         await ctf.emitBefore('submitFlag', req)
         var challenge = await Challenge.findOne({ competition: req.competition, id: req.params.id, enabled: true })
-        if (!challenge) throw "challenge not found"
+        var challegeNotFoundError = 'challenge not found'
+        if (!challenge) throw challegeNotFoundError
         var team = await Team.findOneSerialized({ competition: req.competition, id: req.user.team })
         if (team.solves.map(solve => solve.challenge.id).indexOf(challenge.id) === -1) {
           var submission = new Submission({
@@ -143,7 +143,8 @@ module.exports = function (ctf) {
       res.sendStatus(204)
     } else {
       res.status(403).json({message: 'action_forbidden'})
-    }})
+    }
+  })
 
   // delete a challenge
   router.delete('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
