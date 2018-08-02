@@ -33,10 +33,6 @@ Creating, modifying, and viewing challenges, and submitting flags.
 
 Creating, modifying, and viewing competitions.
 
-### [Home](home.md)
-
-Modifying information about the CTF (home page).
-
 ## Responses
 
 Required properties are (almost) always returned with an object. Exceptions are noted when they occur.
