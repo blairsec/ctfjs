@@ -4,7 +4,8 @@
   "description": "A CTF platform backend API.",
   "main": "ctf.js",
   "scripts": {
-    "test": "mocha --exit -C"
+    "test": "nyc mocha --exit -C",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
@@ -34,7 +35,9 @@
     "pm2": "^2.10.3"
   },
   "devDependencies": {
+    "coveralls": "^3.0.2",
     "mocha": "^5.2.0",
+    "nyc": "^12.0.2",
     "supertest": "^3.1.0"
   }
 }
