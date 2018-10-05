@@ -76,7 +76,7 @@ class Model {
     // validate
     var valid = this.validate(object)
     if (valid === true) {
-      if (this.id === undefined) {
+      if (this.id === undefined || this.id === null) {
         // create new object if no id yet
         object = (await this.db(this.constructor.tableName).insert(object, '*'))[0]
         Object.assign(this, object)
