@@ -48,6 +48,7 @@ module.exports = function (ctf) {
 
   // get info about a user
   router.get('/:user', async (req, res, next) => {
+    if (isNaN(req.params.user)) return res.status(404).json({message: 'user_not_found'})
     await ctf.emitBefore('getUser', req)
     try {
       var user = await User.findOneSerialized({ id: req.params.user, competition: req.competition })
@@ -68,6 +69,7 @@ module.exports = function (ctf) {
   ], passport.authenticate('jwt', { session: false }), async (req, res) => {
     var errors = validationResult(req)
     errors = errors.array().map(e => e.param)
+    if (isNaN(req.params.user)) return res.status(404).json({message: 'user_not_found'})
 
     if (errors.length > 0) return res.status(400).json({ message: 'invalid_values' })
 

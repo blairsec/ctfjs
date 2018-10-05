@@ -57,6 +57,7 @@ module.exports = function (ctf) {
 
   // get a team
   router.get('/:team', async (req, res, next) => {
+    if (isNaN(req.params.team)) return res.status(404).json({message: 'team_not_found'})
     try {
       await ctf.emitBefore('getTeam', req)
       var team = await Team.findOneSerialized({ competition: req.competition, id: req.params.team })
