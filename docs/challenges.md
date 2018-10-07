@@ -8,6 +8,7 @@ Gets a list of challenges. Includes disabled challenges if admin.
 |code|description|content|
 |----|-----------|-------|
 |200|a list of challenges|array of [challenges](index.md#challenge-list)|
+|403|competition has not started|`{"message": "competition_not_started"}`|
 
 ## Get a challenge
 Gets a single challenge. Returns 404 for disabled challenges unless admin.
@@ -18,6 +19,7 @@ Gets a single challenge. Returns 404 for disabled challenges unless admin.
 |----|-----------|-------|
 |200|the challenge|a [challenge](index.md#challenge)|
 |404|not found|`{"message": "challenge_not_found"}`|
+|403|competition has not started|`{"message": "competition_not_started"}`|
 
 ## Create a challenge :lock:
 Creates a challenge. Requires admin.
@@ -63,6 +65,7 @@ Submits a flag for a challenge. Requires the user to be on a team.
 |403|user not on team|`{"message": "user_not_on_team"}`|
 |401|authentication failed|none|
 |400|invalid data provided|`{"message": "invalid_values"}`|
+|403|competition has not started|`{"message": "competition_not_started"}`|
 
 ## Modify a challenge :lock:
 

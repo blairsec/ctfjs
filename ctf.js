@@ -106,6 +106,16 @@ module.exports = class CTF {
     this.router = router
   }
 
+  async competitionStarted (req, res, next) {
+    if (req.competition) {
+      var competition = await Competition.findOne({ id: req.competition })
+      if (+new Date(competition.start) > +new Date()) res.status(403).json({message: 'competition_not_started'})
+      else next()
+    } else {
+      res.status(403).json({message: 'competition_not_started'})
+    }
+  }
+
   async _assignCompetition (req, res, next) {
     var competition
     req.competition = req.params.competition

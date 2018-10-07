@@ -9,7 +9,7 @@ module.exports = function (ctf) {
   var { body, validationResult } = require('express-validator/check')
 
   // get a list of challenges
-  router.get('/', async (req, res, next) => {
+  router.get('/', ctf.competitionStarted, async (req, res, next) => {
     passport.authenticate('jwt', { session: false }, async function (err, user) {
       if (err) throw err
       var options = {}
@@ -21,7 +21,7 @@ module.exports = function (ctf) {
     })(req, res, next)
   })
 
-  router.get('/:id', async (req, res, next) => {
+  router.get('/:id', ctf.competitionStarted, async (req, res, next) => {
     passport.authenticate('jwt', { session: false }, async function (err, user) {
       if (err) throw err
       var options = {}
@@ -74,7 +74,7 @@ module.exports = function (ctf) {
   // submit flag
   router.post('/:id/submissions', [
     body('flag').isString().isLength({ min: 1 })
-  ], passport.authenticate('jwt', { session: false }), async (req, res) => {
+  ], ctf.competitionStarted, passport.authenticate('jwt', { session: false }), async (req, res) => {
     if (req.user.team) {
       var errors = validationResult(req)
       if (!errors.isEmpty()) {

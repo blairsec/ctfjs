@@ -133,8 +133,8 @@ describe('Server Tests', function () {
             end: new Date(new Date() + 500000).toISOString()
           })
           .expect(201)
-          .then(function (response) {
-            request(app)
+          .then(function () {
+            return request(app)
               .post('/competitions')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
@@ -147,7 +147,25 @@ describe('Server Tests', function () {
                 start: new Date().toISOString(),
                 end: new Date(+new Date() + 50000).toISOString()
               })
-              .expect(201, done)
+              .expect(201)
+          }).then(function () {
+            return request(app)
+              .post('/competitions')
+              .set('referer', 'https://angstromctf.com')
+              .set('host', 'angstromctf.com')
+              .set('cookie', '_csrf=abc; token=' + adminAuth)
+              .send({
+                _csrf: 'abc',
+                name: 'testing',
+                about: 'for testing',
+                teamSize: 2,
+                start: new Date(+new Date() + 30000).toISOString(),
+                end: new Date(+new Date() + 50000).toISOString()
+              })
+              .expect(201)
+              .then(function () {
+                done()
+              })
           }).catch(function (error) {
             done(error)
           })
@@ -213,7 +231,7 @@ describe('Server Tests', function () {
           .expect('Content-Type', /json/)
           .expect(200)
           .then(response => {
-            assert.strictEqual(response.body.length, 2)
+            assert.strictEqual(response.body.length, 3)
             var competition = response.body.filter(c => c.id === 1)[0]
             assert.strictEqual(competition.id, 1)
             assert.strictEqual(competition.name, 'testing')
@@ -297,7 +315,7 @@ describe('Server Tests', function () {
       })
       it('404 | returns 404 when getting nonexistent competition', function (done) {
         request(app)
-          .get('/competitions/3')
+          .get('/competitions/4')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
           .expect(404, done)
@@ -325,14 +343,14 @@ describe('Server Tests', function () {
       })
     })
     describe('GET /competitions', function () {
-      it('200 | sees one competition', function (done) {
+      it('200 | sees two competitions', function (done) {
         request(app)
           .get('/competitions')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
           .expect(200)
           .then(function (response) {
-            assert.strictEqual(response.body.length, 1)
+            assert.strictEqual(response.body.length, 2)
             done()
           }).catch(function (error) {
             done(error)
@@ -1185,6 +1203,14 @@ describe('Server Tests', function () {
             done(error)
           })
       })
+      it('403 | does not return challenges if competition not started', function (done) {
+        request(app)
+          .get('/competitions/3/challenges')
+          .set('referer', 'https://angstromctf.com')
+          .set('host', 'angstromctf.com')
+          .expect(403)
+          .expect({ message: 'competition_not_started' }, done)
+      })
     })
     describe('PATCH /competitions/{id}/challenges/{id}', function () {
       it('204 | modifies a challenge', function (done) {
@@ -1371,6 +1397,19 @@ describe('Server Tests', function () {
           .expect(400)
           .expect({message: 'challenge_already_solved'}, done)
       })
+      it('403 | does not allow submission if competition not started', function (done) {
+        request(app)
+          .post('/competitions/3/challenges/1/submissions')
+          .set('referer', 'https://angstromctf.com')
+          .set('host', 'angstromctf.com')
+          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .send({
+            _csrf: 'abc',
+            flag: 'test flag 2'
+          })
+          .expect(403)
+          .expect({ message: 'competition_not_started' }, done)
+      })
     })
     describe('GET /competitions/{id}/challenges/{id}', function () {
       it('200 | gets a challenge', function (done) {
@@ -1491,6 +1530,14 @@ describe('Server Tests', function () {
           .set('host', 'angstromctf.com')
           .expect(404)
           .expect({message: 'challenge_not_found'}, done)
+      })
+      it('403 | does not return challenge if competition not started', function (done) {
+        request(app)
+          .get('/competitions/3/challenges/1')
+          .set('referer', 'https://angstromctf.com')
+          .set('host', 'angstromctf.com')
+          .expect(403)
+          .expect({ message: 'competition_not_started' }, done)
       })
     })
     describe('DELETE /competitions/{id}/challenges/{id}', function () {
