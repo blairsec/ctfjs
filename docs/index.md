@@ -2,7 +2,7 @@ ctfjs is a CTF (capture the flag) competition backend written in Node.js.
 
 ## Authentication
 A JWT given by the server is used for authentication for all routes that require it.
-It is sent and received with an autorization header. Ex: `Authorization: Token <token>`
+It is sent and received with an authorization header. Ex: `Authorization: Token <token>`
 
 ## Requests
 All request bodies and responses should be content-type `application/json`.
