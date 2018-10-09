@@ -3,7 +3,8 @@ var process = require('process')
 
 var ctf = new CTF({
   db_uri: process.env.DATABASE_URI,
-  jwt_secret: process.env.SECRET_KEY
+  jwt_secret: process.env.SECRET_KEY,
+  cors_origin: process.env.CORS_ORIGIN
 })
 
 var express = require('express')

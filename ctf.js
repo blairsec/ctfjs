@@ -1,5 +1,4 @@
 var passport = require('passport')
-var url = require('url')
 
 var Competition = require('./models/competition')
 
@@ -63,7 +62,13 @@ module.exports = class CTF {
     var express = require('express')
     var bodyParser = require('body-parser')
     var cookieParser = require('cookie-parser')
+    var cors = require('cors')
     var router = express.Router()
+
+    var corsMiddleware = config.cors_origin ? cors({ origin: config.cors_origin, credentials: true }) : (req, res, next) => { next() }
+
+    router.use(corsMiddleware)
+    router.options(corsMiddleware)
 
     var usersRouter = require('./routes/users')(this)
     var authRouter = require('./routes/auth')(this)
@@ -82,8 +87,8 @@ module.exports = class CTF {
     router.use(bodyParser.json())
     router.use(cookieParser())
     router.use(function (req, res, next) {
-      if (req.headers.referer && req.headers.host === url.parse(req.headers.referer).host && (req.method === 'GET' || req.method === 'HEAD' ||
-        (req.cookies && req.cookies._csrf && ((req.body && req.body._csrf && req.cookies._csrf === req.body._csrf) ||
+      if ((req.method === 'GET' || req.method === 'HEAD' || (req.cookies && req.cookies._csrf &&
+        ((req.body && req.body._csrf && req.cookies._csrf === req.body._csrf) ||
         (req.query && req.query._csrf && req.cookies._csrf === req.query._csrf))))) {
         next()
       } else {

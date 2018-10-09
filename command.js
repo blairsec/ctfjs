@@ -12,7 +12,7 @@ var config = {
 }
 
 function start (callback) {
-  var env = { PORT: config.port, DATABASE_URI: config.db_uri, SECRET_KEY: config.jwt_secret }
+  var env = { PORT: config.port, DATABASE_URI: config.db_uri, SECRET_KEY: config.jwt_secret, CORS_ORIGIN: config.cors_origin }
   if (config.plugin_folder) env.PLUGIN_FOLDER = config.plugin_folder
   pm2.start(path.join(__dirname, 'index.js'), { env: env, name: 'ctf' }, function (err, proc) {
     if (err && err.message === 'Script already launched') console.log('Error: ctfjs already running')
@@ -32,14 +32,16 @@ program
   .command('start')
   .option('-r, --restart', 'restart if already running')
   .option('-s, --secret-key <secret_key>', 'secret key')
-  .option('-d --database <database_uri>', 'database URI')
-  .option('-p --port <port>', 'port to listen on')
+  .option('-d, --database <database_uri>', 'database URI')
+  .option('-p, --port <port>', 'port to listen on')
+  .option('-o, --cors-origin <cors_origin>', 'origin for CORS header')
   .option('-f, --plugin-folder <plugin_folder>', 'plugins folder')
   .action(function (command) {
     if (command.secretKey) config.jwt_secret = command.secretKey
     if (command.database) config.db_uri = command.database
     if (command.port) config.port = command.port
     if (command.pluginFolder) config.plugin_folder = path.resolve(command.pluginFolder)
+    if (command.corsOrigin) config.cors_origin = command.corsOrigin
     if (command.restart) stop(function () { start(function () { process.exit(0) }) })
     else start(function () { process.exit(0) })
   })
