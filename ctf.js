@@ -37,8 +37,8 @@ module.exports = class CTF {
     passport.use(new JwtStrategy({
       jwtFromRequest: function (req) {
         var token = null
-        if (req && req.cookies) {
-          token = req.cookies.token
+        if (req && req.headers && req.headers.authorization && req.headers.authorization.split(" ")[0] == "Token"  && req.headers.authorization.split(" ")[1]) {
+          token = req.headers.authorization.split(" ")[1]
         }
         return token
       },
@@ -61,14 +61,16 @@ module.exports = class CTF {
     // server config
     var express = require('express')
     var bodyParser = require('body-parser')
-    var cookieParser = require('cookie-parser')
     var cors = require('cors')
     var router = express.Router()
 
-    var corsMiddleware = config.cors_origin ? cors({ origin: config.cors_origin, credentials: true }) : (req, res, next) => { next() }
+    var corsMiddleware
+    if (config.cors_origin) corsMiddleware = cors({ origin: config.cors_origin, allowedHeaders: ['Authorization', 'Content-Type'] })
 
-    router.use(corsMiddleware)
-    router.options(corsMiddleware)
+    if (corsMiddleware) {
+      router.use(corsMiddleware)
+      router.options(corsMiddleware)
+    }
 
     var usersRouter = require('./routes/users')(this)
     var authRouter = require('./routes/auth')(this)
@@ -85,16 +87,6 @@ module.exports = class CTF {
 
     router.use(passport.initialize())
     router.use(bodyParser.json())
-    router.use(cookieParser())
-    router.use(function (req, res, next) {
-      if ((req.method === 'GET' || req.method === 'HEAD' || (req.cookies && req.cookies._csrf &&
-        ((req.body && req.body._csrf && req.cookies._csrf === req.body._csrf) ||
-        (req.query && req.query._csrf && req.cookies._csrf === req.query._csrf))))) {
-        next()
-      } else {
-        res.status(400).json({message: 'invalid_csrf'})
-      }
-    })
     router.use('/competitions/:competition/auth', this._assignCompetition, authRouter)
     router.use('/competitions/:competition/users', this._assignCompetition, usersRouter)
     router.use('/competitions/:competition/teams', this._assignCompetition, teamsRouter)

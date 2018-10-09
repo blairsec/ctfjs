@@ -2,13 +2,11 @@ ctfjs is a CTF (capture the flag) competition backend written in Node.js.
 
 ## Authentication
 A JWT given by the server is used for authentication for all routes that require it.
-It is sent and received with the cookie `token`.
+It is sent and received with an autorization header. Ex: `Authorization: Token <token>`
 
 ## Requests
 All request bodies and responses should be content-type `application/json`.
 Error responses are either empty or of the form `{"message": <string>}`.
-
-Requests that are not GET or HEAD require a matching `_csrf` cookie and body property or query parameter. If they do not pass this check, they will return 400 with the body `{"message": "invalid_csrf"}`.
 
 Required request parameters that are strings must be at least 1 character long.
 
