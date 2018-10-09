@@ -32,7 +32,6 @@ describe('Server Tests', function () {
           .post('/admin')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc')
           .send({
             'email': '  email@email.email  ',
             'username': ' admin   ',
@@ -46,7 +45,6 @@ describe('Server Tests', function () {
           .post('/admin')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc')
           .send({
             'email': 'email2@email.email',
             'username': 'admin',
@@ -84,7 +82,6 @@ describe('Server Tests', function () {
           .post('/admin/auth')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc')
           .send({
             'username': 'admin',
             'password': 'admin123',
@@ -99,7 +96,7 @@ describe('Server Tests', function () {
               .post('/admin')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc; token=' + adminAuth)
+              .set('authorization', 'Token ' + adminAuth)
               .send({
                 _csrf: 'abc',
                 username: 'admin',
@@ -123,7 +120,7 @@ describe('Server Tests', function () {
           .post('/competitions')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             _csrf: 'abc',
             name: 'testing',
@@ -138,7 +135,7 @@ describe('Server Tests', function () {
               .post('/competitions')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc; token=' + adminAuth)
+              .set('authorization', 'Token ' + adminAuth)
               .send({
                 _csrf: 'abc',
                 name: 'testing',
@@ -153,7 +150,7 @@ describe('Server Tests', function () {
               .post('/competitions')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc; token=' + adminAuth)
+              .set('authorization', 'Token ' + adminAuth)
               .send({
                 _csrf: 'abc',
                 name: 'testing',
@@ -175,7 +172,6 @@ describe('Server Tests', function () {
           .post('/competitions/2/users')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc')
           .send({
             _csrf: 'abc',
             username: 'test',
@@ -189,7 +185,6 @@ describe('Server Tests', function () {
               .post('/competitions/2/auth')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc')
               .send({
                 _csrf: 'abc',
                 username: 'test',
@@ -203,7 +198,7 @@ describe('Server Tests', function () {
                   .post('/competitions')
                   .set('referer', 'https://angstromctf.com')
                   .set('host', 'angstromctf.com')
-                  .set('cookie', '_csrf=abc; token=' + userAuth[3])
+                  .set('authorization', 'Token ' + userAuth[3])
                   .send({
                     _csrf: 'abc',
                     name: 'testing',
@@ -252,7 +247,7 @@ describe('Server Tests', function () {
           .patch('/competitions/1')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             _csrf: 'abc',
             about: 'this is for testing!!!',
@@ -265,7 +260,7 @@ describe('Server Tests', function () {
               .patch('/competitions/1')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc; token=' + adminAuth)
+              .set('authorization', 'Token ' + adminAuth)
               .send({
                 _csrf: 'abc',
                 about: 'this is for testing'
@@ -280,7 +275,7 @@ describe('Server Tests', function () {
           .patch('/competitions/1')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             _csrf: 'abc',
             about: 'this is for testing',
@@ -328,7 +323,7 @@ describe('Server Tests', function () {
           .query({ _csrf: 'abc' })
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .expect(204, done)
       })
       it('403 | does not allow non-admin to delete', function (done) {
@@ -337,7 +332,7 @@ describe('Server Tests', function () {
           .query({ _csrf: 'abc' })
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .expect(403)
           .expect({message: 'action_forbidden'}, done)
       })
@@ -366,7 +361,6 @@ describe('Server Tests', function () {
           .post('/competitions/2/users')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc')
           .send({
             _csrf: 'abc',
             username: ' test2 \t ',
@@ -380,7 +374,6 @@ describe('Server Tests', function () {
               .post('/competitions/2/users')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc')
               .send({
                 _csrf: 'abc',
                 username: 'test3',
@@ -394,7 +387,6 @@ describe('Server Tests', function () {
                   .post('/competitions/2/users')
                   .set('referer', 'https://angstromctf.com')
                   .set('host', 'angstromctf.com')
-                  .set('cookie', '_csrf=abc')
                   .send({
                     _csrf: 'abc',
                     username: 'test4',
@@ -438,7 +430,6 @@ describe('Server Tests', function () {
           .post('/competitions/2/auth')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc')
           .send({
             _csrf: 'abc',
             username: 'test2',
@@ -452,7 +443,6 @@ describe('Server Tests', function () {
               .post('/competitions/2/auth')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc')
               .send({
                 _csrf: 'abc',
                 username: 'test3',
@@ -466,7 +456,6 @@ describe('Server Tests', function () {
                   .post('/competitions/2/auth')
                   .set('referer', 'https://angstromctf.com')
                   .set('host', 'angstromctf.com')
-                  .set('cookie', '_csrf=abc')
                   .send({
                     _csrf: 'abc',
                     username: 'test4',
@@ -494,7 +483,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/users/3')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             _csrf: 'abc',
             email: 'test6@test1.test1',
@@ -507,7 +496,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/users/3')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             _csrf: 'abc',
             username: 'test1',
@@ -521,7 +510,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/users/3')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[5])
+          .set('authorization', 'Token ' + userAuth[5])
           .send({
             _csrf: 'abc',
             username: 'test1',
@@ -536,7 +525,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/users/8')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             _csrf: 'abc',
             username: 'test1',
@@ -551,7 +540,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/users/5')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             _csrf: 'abc',
             username: 'test1',
@@ -566,7 +555,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/users/5')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             _csrf: 'abc',
             username: 'test1643745',
@@ -613,7 +602,6 @@ describe('Server Tests', function () {
           .post('/competitions/2/users')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc')
           .send({
             _csrf: 'abc',
             username: 'test1',
@@ -629,7 +617,6 @@ describe('Server Tests', function () {
           .post('/competitions/2/users')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc')
           .send({
             _csrf: 'abc',
             username: 'test163',
@@ -647,7 +634,7 @@ describe('Server Tests', function () {
           .post('/admin')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             'email': 'email2@email.email',
             'username': 'admin',
@@ -662,7 +649,7 @@ describe('Server Tests', function () {
           .post('/admin')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             'email': 'email@email.email',
             'username': 'admin2',
@@ -682,7 +669,7 @@ describe('Server Tests', function () {
           .post('/competitions/2/teams')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             name: '   team1 \t\t\t  ',
             affiliation: 'testing team 1',
@@ -696,7 +683,7 @@ describe('Server Tests', function () {
           .post('/competitions/2/teams')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[6])
+          .set('authorization', 'Token ' + userAuth[6])
           .send({
             name: 'team2',
             affiliation: 'testing team 2',
@@ -710,7 +697,7 @@ describe('Server Tests', function () {
           .post('/competitions/2/teams')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             name: 'team3',
             affiliation: 'testing team 3',
@@ -725,7 +712,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             _csrf: 'abc',
             start: new Date(+new Date() + 500000).toISOString()
@@ -736,7 +723,7 @@ describe('Server Tests', function () {
               .post('/competitions/2/teams')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc; token=' + userAuth[3])
+              .set('authorization', 'Token ' + userAuth[3])
               .send({
                 name: 'team3',
                 affiliation: 'testing team 3',
@@ -749,7 +736,7 @@ describe('Server Tests', function () {
                   .patch('/competitions/2')
                   .set('referer', 'https://angstromctf.com')
                   .set('host', 'angstromctf.com')
-                  .set('cookie', '_csrf=abc; token=' + adminAuth)
+                  .set('authorization', 'Token ' + adminAuth)
                   .send({
                     _csrf: 'abc',
                     start: new Date().toISOString()
@@ -767,7 +754,7 @@ describe('Server Tests', function () {
           .post('/competitions/2/teams')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[7])
+          .set('authorization', 'Token ' + userAuth[7])
           .send({
             name: 'team3',
             affiliation: 'testing team 3',
@@ -784,7 +771,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/teams')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[5])
+          .set('authorization', 'Token ' + userAuth[5])
           .send({
             name: 'team3',
             passcode: 'team3team3',
@@ -797,7 +784,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/teams')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[7])
+          .set('authorization', 'Token ' + userAuth[7])
           .send({
             name: 'team3',
             passcode: 'team3team3',
@@ -811,7 +798,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/teams')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[5])
+          .set('authorization', 'Token ' + userAuth[5])
           .send({
             name: 'team3',
             passcode: 'team3team3',
@@ -825,7 +812,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/teams')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[5])
+          .set('authorization', 'Token ' + userAuth[5])
           .send({
             name: 'team2',
             passcode: 'team2team2',
@@ -839,7 +826,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             _csrf: 'abc',
             start: new Date(+new Date() + 500000).toISOString()
@@ -850,7 +837,7 @@ describe('Server Tests', function () {
               .patch('/competitions/2/teams')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc; token=' + userAuth[5])
+              .set('authorization', 'Token ' + userAuth[5])
               .send({
                 name: 'team2',
                 passcode: 'team2team2',
@@ -862,7 +849,7 @@ describe('Server Tests', function () {
                   .patch('/competitions/2')
                   .set('referer', 'https://angstromctf.com')
                   .set('host', 'angstromctf.com')
-                  .set('cookie', '_csrf=abc; token=' + adminAuth)
+                  .set('authorization', 'Token ' + adminAuth)
                   .send({
                     _csrf: 'abc',
                     start: new Date().toISOString()
@@ -941,7 +928,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/teams/3')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             _csrf: 'abc',
             name: 'edited name'
@@ -968,7 +955,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/teams/3')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             _csrf: 'abc',
             affiliation: 'edited affiliation'
@@ -995,7 +982,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/teams/6')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             _csrf: 'abc',
             affiliation: 'edited affiliation'
@@ -1008,7 +995,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/teams/3')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[6])
+          .set('authorization', 'Token ' + userAuth[6])
           .send({
             _csrf: 'abc',
             affiliation: 'edited affiliation'
@@ -1021,7 +1008,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/teams/3')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             _csrf: 'abc',
             name: 'team2'
@@ -1039,7 +1026,7 @@ describe('Server Tests', function () {
           .post('/competitions/2/challenges')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             _csrf: 'abc',
             title: 'test title',
@@ -1057,7 +1044,7 @@ describe('Server Tests', function () {
               .post('/competitions/2/challenges')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc; token=' + adminAuth)
+              .set('authorization', 'Token ' + adminAuth)
               .send({
                 _csrf: 'abc',
                 title: 'test title 2',
@@ -1075,7 +1062,7 @@ describe('Server Tests', function () {
               .post('/competitions/2/challenges')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc; token=' + adminAuth)
+              .set('authorization', 'Token ' + adminAuth)
               .send({
                 _csrf: 'abc',
                 title: 'test title 3',
@@ -1092,7 +1079,7 @@ describe('Server Tests', function () {
               .post('/competitions/2/challenges')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc; token=' + adminAuth)
+              .set('authorization', 'Token ' + adminAuth)
               .send({
                 _csrf: 'abc',
                 title: 'test title',
@@ -1112,7 +1099,7 @@ describe('Server Tests', function () {
           .post('/competitions/2/challenges')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             _csrf: 'abc',
             title: 'test title',
@@ -1156,7 +1143,7 @@ describe('Server Tests', function () {
           .get('/competitions/2/challenges')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .expect(200)
           .then(function (response) {
             assert.strictEqual(response.body.length, 3)
@@ -1181,7 +1168,7 @@ describe('Server Tests', function () {
           .get('/competitions/2/challenges')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .expect(200)
           .then(function (response) {
             assert.strictEqual(response.body.length, 4)
@@ -1218,7 +1205,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/challenges/1')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .send({
             _csrf: 'abc',
             title: 'test title 2!',
@@ -1235,7 +1222,7 @@ describe('Server Tests', function () {
               .patch('/competitions/2/challenges/1')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc; token=' + adminAuth)
+              .set('authorization', 'Token ' + adminAuth)
               .send({
                 _csrf: 'abc',
                 title: 'test title 2'
@@ -1247,7 +1234,7 @@ describe('Server Tests', function () {
               .patch('/competitions/2/challenges/1')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc; token=' + adminAuth)
+              .set('authorization', 'Token ' + adminAuth)
               .send({
                 enabled: false,
                 _csrf: 'abc'
@@ -1266,7 +1253,7 @@ describe('Server Tests', function () {
               .patch('/competitions/2/challenges/1')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc; token=' + adminAuth)
+              .set('authorization', 'Token ' + adminAuth)
               .send({
                 enabled: true,
                 _csrf: 'abc'
@@ -1292,7 +1279,7 @@ describe('Server Tests', function () {
           .patch('/competitions/2/challenges/1')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             _csrf: 'abc',
             title: 'test title 2',
@@ -1311,7 +1298,7 @@ describe('Server Tests', function () {
           .post('/competitions/2/challenges/1/submissions')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             _csrf: 'abc',
             flag: 'lsdjaflksajf'
@@ -1324,7 +1311,7 @@ describe('Server Tests', function () {
           .post('/competitions/2/challenges/1/submissions')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             _csrf: 'abc',
             flag: 'test flag 2'
@@ -1336,7 +1323,7 @@ describe('Server Tests', function () {
               .post('/competitions/2/challenges/2/submissions')
               .set('referer', 'https://angstromctf.com')
               .set('host', 'angstromctf.com')
-              .set('cookie', '_csrf=abc; token=' + userAuth[5])
+              .set('authorization', 'Token ' + userAuth[5])
               .send({
                 _csrf: 'abc',
                 flag: 'test flag'
@@ -1350,7 +1337,7 @@ describe('Server Tests', function () {
           .post('/competitions/2/challenges/5/submissions')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             _csrf: 'abc',
             flag: 'test flag 2'
@@ -1363,7 +1350,7 @@ describe('Server Tests', function () {
           .post('/competitions/2/challenges/4/submissions')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             _csrf: 'abc',
             flag: 'test flag 2'
@@ -1376,7 +1363,7 @@ describe('Server Tests', function () {
           .post('/competitions/2/challenges/5/submissions')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[7])
+          .set('authorization', 'Token ' + userAuth[7])
           .send({
             _csrf: 'abc',
             flag: 'test flag 2'
@@ -1389,7 +1376,7 @@ describe('Server Tests', function () {
           .post('/competitions/2/challenges/1/submissions')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             _csrf: 'abc',
             flag: 'test flag 2'
@@ -1402,7 +1389,7 @@ describe('Server Tests', function () {
           .post('/competitions/3/challenges/1/submissions')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .send({
             _csrf: 'abc',
             flag: 'test flag 2'
@@ -1462,7 +1449,7 @@ describe('Server Tests', function () {
           .get('/competitions/2/challenges/1')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', 'token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .expect(200)
           .then(function (response) {
             assert.strictEqual(Object.keys(response.body).length, 10)
@@ -1495,7 +1482,7 @@ describe('Server Tests', function () {
           .get('/competitions/2/challenges/4')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', 'token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .expect(200)
           .then(function (response) {
             var challenge = response.body
@@ -1546,7 +1533,7 @@ describe('Server Tests', function () {
           .delete('/competitions/2/challenges/1')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .query({_csrf: 'abc'})
           .expect(403)
           .expect({message: 'action_forbidden'}, done)
@@ -1556,7 +1543,7 @@ describe('Server Tests', function () {
           .delete('/competitions/2/challenges/1')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + adminAuth)
+          .set('authorization', 'Token ' + adminAuth)
           .query({_csrf: 'abc'})
           .expect(204)
           .then(function () {
@@ -1579,7 +1566,7 @@ describe('Server Tests', function () {
           .get('/self')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[3])
+          .set('authorization', 'Token ' + userAuth[3])
           .expect(200)
           .then(function (response) {
             assert.strictEqual(Object.keys(response.body).length, 2)
@@ -1609,7 +1596,7 @@ describe('Server Tests', function () {
           .get('/self')
           .set('referer', 'https://angstromctf.com')
           .set('host', 'angstromctf.com')
-          .set('cookie', '_csrf=abc; token=' + userAuth[7])
+          .set('authorization', 'Token ' + userAuth[7])
           .expect(200)
           .then(function (response) {
             assert.strictEqual(Object.keys(response.body).length, 2)
@@ -1634,7 +1621,6 @@ describe('Server Tests', function () {
         .patch('/competitions/2/users/1')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc' })
         .expect(401, done)
     })
@@ -1643,7 +1629,6 @@ describe('Server Tests', function () {
         .post('/competitions/2/teams')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc' })
         .expect(401, done)
     })
@@ -1652,7 +1637,6 @@ describe('Server Tests', function () {
         .patch('/competitions/2/teams')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc' })
         .expect(401, done)
     })
@@ -1661,7 +1645,6 @@ describe('Server Tests', function () {
         .patch('/competitions/2/teams/1')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc' })
         .expect(401, done)
     })
@@ -1670,7 +1653,6 @@ describe('Server Tests', function () {
         .post('/admin/auth')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc', username: 'x', password: 'x' })
         .expect(401, done)
     })
@@ -1679,7 +1661,6 @@ describe('Server Tests', function () {
         .post('/competitions/2/auth')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc', username: 'x', password: 'x' })
         .expect(401, done)
     })
@@ -1688,7 +1669,6 @@ describe('Server Tests', function () {
         .get('/self')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc' })
         .expect(401, done)
     })
@@ -1697,7 +1677,6 @@ describe('Server Tests', function () {
         .post('/competitions/2/challenges')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc' })
         .expect(401, done)
     })
@@ -1706,7 +1685,6 @@ describe('Server Tests', function () {
         .post('/competitions/2/challenges/1/submissions')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc' })
         .expect(401, done)
     })
@@ -1715,7 +1693,6 @@ describe('Server Tests', function () {
         .patch('/competitions/2/challenges/1')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc' })
         .expect(401, done)
     })
@@ -1724,7 +1701,6 @@ describe('Server Tests', function () {
         .delete('/competitions/2/challenges/1')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc' })
         .expect(401, done)
     })
@@ -1733,7 +1709,6 @@ describe('Server Tests', function () {
         .post('/competitions')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc' })
         .expect(401, done)
     })
@@ -1742,7 +1717,6 @@ describe('Server Tests', function () {
         .patch('/competitions/2')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc' })
         .expect(401, done)
     })
@@ -1751,7 +1725,6 @@ describe('Server Tests', function () {
         .delete('/competitions/2')
         .set('referer', 'https://angstromctf.com')
         .set('host', 'angstromctf.com')
-        .set('cookie', '_csrf=abc')
         .send({ _csrf: 'abc' })
         .expect(401, done)
     })

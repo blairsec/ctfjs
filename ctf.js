@@ -37,8 +37,8 @@ module.exports = class CTF {
     passport.use(new JwtStrategy({
       jwtFromRequest: function (req) {
         var token = null
-        if (req && req.headers && req.headers.authorization && req.headers.authorization.split(" ")[0] == "Token"  && req.headers.authorization.split(" ")[1]) {
-          token = req.headers.authorization.split(" ")[1]
+        if (req && req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Token' && req.headers.authorization.split(' ')[1]) {
+          token = req.headers.authorization.split(' ')[1]
         }
         return token
       },
