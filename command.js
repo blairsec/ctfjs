@@ -34,7 +34,7 @@ program
   .option('-s, --secret-key <secret_key>', 'secret key')
   .option('-d, --database <database_uri>', 'database URI')
   .option('-p, --port <port>', 'port to listen on')
-  .option('-o, --cors-origin <cors_origin>', 'origin for CORS header')
+  .option('-o, --cors-origin <cors_origin>', 'comma separated list of origins for CORS header')
   .option('-f, --plugin-folder <plugin_folder>', 'plugins folder')
   .action(function (command) {
     if (command.secretKey) config.jwt_secret = command.secretKey
