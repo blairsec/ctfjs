@@ -46,9 +46,18 @@ module.exports = function (ctf) {
 
   // view admins
   router.get('/', async (req, res) => {
-    ctf.emitBefore()
     var admins = await User.findSerialized({ admin: true }, { team: false })
     res.json(admins)
+  })
+
+  // delete admin
+  router.delete('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    if (req.user.admin === true) {
+      await User.delete({ id: req.params.id, admin: true })
+      res.sendStatus(204)
+    } else {
+      req.sendStatus(403).json({message: 'action_forbidden'})
+    }
   })
 
   // give authentication token

@@ -55,3 +55,15 @@ Creates and sends authentication token to user if they are an admin.
 | 200  | return token and set token cookie           | `{"token": <token>}` |
 | 401  | invalid credentials or user is not an admin | none                 |
 
+## Delete an admin :lock:
+
+Delete an admin. Requires admin.
+
+### `DELETE /admin/{id}`
+
+### Responses
+
+| code | description           | content                           |
+| ---- | --------------------- | --------------------------------- |
+| 204  | successfully deleted  | none                              |
+| 403  | action forbidden      | `{"message": "action_forbidden"}` |
