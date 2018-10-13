@@ -46,7 +46,7 @@ program
     if (command.pluginFolder) config.plugin_folder = path.resolve(command.pluginFolder)
     if (command.corsOrigin) config.cors_origin = command.corsOrigin
     if (command.environment) {
-      command.environment = command.environment.split(";")
+      command.environment = command.environment.split(';')
       for (var i = 0; i < command.environment.length; i++) {
         var env = command.environment[i].split(/^([^=]+)=/)
         env.splice(0, 1)
