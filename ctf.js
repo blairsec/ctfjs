@@ -65,7 +65,6 @@ module.exports = class CTF {
     var router = express.Router()
 
     var corsMiddleware
-    console.log(config.cors_origin)
     if (config.cors_origin) corsMiddleware = cors({ origin: config.cors_origin, allowedHeaders: ['Authorization', 'Content-Type'] })
 
     if (corsMiddleware) {
@@ -124,7 +123,7 @@ module.exports = class CTF {
   }
 
   addCompetitionRoute (path, ...middleware) {
-    this.router.use('/competitons/:competition' + path, this._assignCompetition, ...middleware)
+    this.router.use('/competitions/:competition' + path, this._assignCompetition, ...middleware)
   }
 
   addGlobalRoute (path, ...middleware) {
