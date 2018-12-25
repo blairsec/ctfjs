@@ -149,6 +149,7 @@ Optional properties are returned as specified in the description or the route. I
 |----|----|-----------|-------|
 |hint|string|challenge hint|if exists|
 |enabled|boolean|whether challenge is enabled|if admin|
+|flag|string|the flag|if admin|
 
 ### Challenge List
 
@@ -170,6 +171,7 @@ Optional properties are returned as specified in the description or the route. I
 |----|----|-----------|-------|
 |hint|string|challenge hint|if exists|
 |enabled|boolean|whether challenge is enabled|if admin|
+|flag|string|the flag|if admin|
 
 ### Competition
 

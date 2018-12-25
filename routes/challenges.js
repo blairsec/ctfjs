@@ -13,7 +13,10 @@ module.exports = function (ctf) {
     passport.authenticate('jwt', { session: false }, async function (err, user) {
       if (err) throw err
       var options = {}
-      if (user && user.admin === true) options.showDisabled = true
+      if (user && user.admin === true) {
+        options.showDisabled = true
+        options.includeFlag = true
+      }
       await ctf.emitBefore('getChallenges', req)
       var challenges = await Challenge.findSerialized({competition: req.competition}, options)
       await ctf.emitAfter('getChallenges', req, { challenges: challenges })

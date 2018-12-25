@@ -1163,7 +1163,7 @@ describe('Server Tests', function () {
             done(error)
           })
       })
-      it('200 | gets disabled challenges as well if admin', function (done) {
+      it('200 | gets disabled challenges and flags as well if admin', function (done) {
         request(app)
           .get('/competitions/2/challenges')
           .set('referer', 'https://angstromctf.com')
@@ -1175,11 +1175,12 @@ describe('Server Tests', function () {
             var challenge = response.body.filter(c => c.id === 1)[0]
             assert.strictEqual(response.body[2].hint, undefined)
             assert.strictEqual(response.body.filter(c => c.id === 4)[0].enabled, false)
-            assert.strictEqual(Object.keys(challenge).length, 9)
+            assert.strictEqual(Object.keys(challenge).length, 10)
             assert.strictEqual(challenge.enabled, true)
             assert.strictEqual(challenge.id, 1)
             assert.strictEqual(challenge.value, 1)
             assert.strictEqual(challenge.title, 'test title')
+            assert.strictEqual(challenge.flag, 'test flag')
             assert.strictEqual(challenge.description, 'test description')
             assert.strictEqual(challenge.author, 'test author')
             assert.strictEqual(challenge.category, 'test category')

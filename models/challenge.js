@@ -48,7 +48,7 @@ class Challenge extends Model {
   }
 
   static async findSerialized (query, options) {
-    if (options === undefined) options = { showDisabled: false }
+    if (options === undefined) options = { showDisabled: false, includeFlag: false }
 
     if (options.showDisabled === true) ;
     else query['enabled'] = true
@@ -60,7 +60,7 @@ class Challenge extends Model {
     }
 
     // get challenges and number of correct submissions for each
-    var challenges = await db.select('challenges.id', 'title', 'description', 'value', 'author', 'category', 'hint', 'enabled').count('submissions.id as solves').from('challenges').where(query).leftJoin('submissions', function () {
+    var challenges = await db.select('challenges.id', 'title', 'description', 'value', 'author', 'category', 'hint', 'enabled', 'flag').count('submissions.id as solves').from('challenges').where(query).leftJoin('submissions', function () {
       this.on('challenges.id', 'submissions.challenge').andOn('challenges.flag', 'submissions.content')
     }).groupBy('challenges.id')
 
@@ -69,6 +69,7 @@ class Challenge extends Model {
       challenges[c].solves = parseInt(challenges[c].solves)
       if (challenges[c].hint === null) delete challenges[c].hint
       if (options.showDisabled !== true) delete challenges[c].enabled
+      if (options.includeFlag !== true) delete challenges[c].flag
     }
 
     return challenges
