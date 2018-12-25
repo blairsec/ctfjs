@@ -1444,7 +1444,7 @@ describe('Server Tests', function () {
             done(error)
           })
       })
-      it('200 | shows enabled property if admin', function (done) {
+      it('200 | shows enabled and flag properties if admin', function (done) {
         request(app)
           .get('/competitions/2/challenges/1')
           .set('referer', 'https://angstromctf.com')
@@ -1452,9 +1452,10 @@ describe('Server Tests', function () {
           .set('authorization', 'Token ' + adminAuth)
           .expect(200)
           .then(function (response) {
-            assert.strictEqual(Object.keys(response.body).length, 10)
+            assert.strictEqual(Object.keys(response.body).length, 11)
             assert.strictEqual(response.body.enabled, true)
             assert.strictEqual(response.body.id, 1)
+            assert.strictEqual(response.body.flag, 'test flag 2')
             assert.strictEqual(response.body.title, 'test title 2')
             assert.strictEqual(response.body.value, 2)
             assert.strictEqual(response.body.description, 'test description 2')
@@ -1486,11 +1487,12 @@ describe('Server Tests', function () {
           .expect(200)
           .then(function (response) {
             var challenge = response.body
-            assert.strictEqual(Object.keys(challenge).length, 10)
+            assert.strictEqual(Object.keys(challenge).length, 11)
             assert.strictEqual(challenge.id, 4)
             assert.strictEqual(typeof challenge.created, 'string')
             assert.strictEqual(challenge.enabled, false)
             assert.strictEqual(challenge.value, 1)
+            assert.strictEqual(challenge.flag, 'test flag')
             assert.strictEqual(challenge.title, 'test title')
             assert.strictEqual(challenge.description, 'test description')
             assert.strictEqual(challenge.author, 'test author')

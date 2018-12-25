@@ -25,7 +25,10 @@ module.exports = function (ctf) {
     passport.authenticate('jwt', { session: false }, async function (err, user) {
       if (err) throw err
       var options = {}
-      if (user && user.admin === true) options.showDisabled = true
+      if (user && user.admin === true) {
+        options.showDisabled = true
+        options.includeFlag = true
+      }
       await ctf.emitBefore('getChallenge', req)
       var challenge = await Challenge.findOneSerialized({id: req.params.id, competition: req.competition}, options)
       await ctf.emitAfter('getChallenge', req, { challenge: challenge })

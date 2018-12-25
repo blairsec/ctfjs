@@ -103,12 +103,13 @@ class Model {
   }
 
   // return one object serialiezd
-  static async findOneSerialized (properties) {
+  static async findOneSerialized (properties, privatePropertiesToInclude) {
+    if (privatePropertiesToInclude === undefined) privatePropertiesToInclude = []
     var object = await this.findOne(properties)
     if (!object) return false
     var serialized = {}
     for (var p = 0; p < this.properties.length; p++) {
-      if (!this.properties[p].private) {
+      if (!this.properties[p].private || privatePropertiesToInclude.indexOf(this.properties[p].name) !== -1) {
         // if the property is not private, consider adding it
         if (this.properties[p].required) {
           // if the property is required, add it

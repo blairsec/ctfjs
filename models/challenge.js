@@ -75,13 +75,16 @@ class Challenge extends Model {
   }
 
   static async findOneSerialized (query, options) {
-    if (options === undefined) options = { showDisabled: false }
+    if (options === undefined) options = { showDisabled: false, includeFlag: false }
 
     if (options.showDisabled === true) ;
     else query['enabled'] = true
 
+    var includePrivate = []
+    if (options.includeFlag === true) includePrivate = ['flag']
+
     var Submission = require('./submission')
-    var challenge = await super.findOneSerialized(query)
+    var challenge = await super.findOneSerialized(query, includePrivate)
 
     if (!options.showDisabled) delete challenge.enabled
 
