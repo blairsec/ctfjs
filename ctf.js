@@ -105,6 +105,7 @@ module.exports = class CTF {
 
   async competitionStarted (req, res, next) {
     passport.authenticate('jwt', { session: false }, async function (err, user) {
+      if (err) return res.sendStatus(500)
       if (req.competition) {
         var competition = await Competition.findOne({ id: req.competition })
         if (+new Date(competition.start) > +new Date() && (!user || user.admin !== true)) res.status(403).json({message: 'competition_not_started'})
