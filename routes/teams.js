@@ -10,13 +10,14 @@ module.exports = function (ctf) {
 
   // create + join team
   router.post('/', [
-    body('name').isString().trim().isLength({ min: 1 }),
+    body('name').isString().trim().isLength({ min: 1, max: 50 }).matches(/^[ -~]+$/),
     body('passcode').isString().isLength({ min: 1 }),
-    body('affiliation').isString().trim().isLength({ min: 1 }).optional()
+    body('affiliation').isString().trim().isLength({ max: 50 }).matches(/^[ -~]*$/).optional()
   ], passport.authenticate('jwt', { session: false }), async (req, res) => {
     // check if data was valid
     var errors = validationResult(req)
     if (!errors.isEmpty()) {
+      console.log(errors.array())
       return res.status(400).json({message: 'invalid_values'})
     }
     await ctf.emitBefore('createTeam', req)
@@ -105,8 +106,8 @@ module.exports = function (ctf) {
 
   // modify a team
   router.patch('/:team', [
-    body('name').isString().trim().isLength({ min: 1 }).optional(),
-    body('affiliation').isString().isLength({ min: 1 }).optional()
+    body('name').isString().trim().isLength({ min: 1, max: 50 }).matches(/^[ -~]+$/).optional(),
+    body('affiliation').isString().trim().isLength({ min: 1, max: 50 }).matches(/^[ -~]+$/).optional()
   ], passport.authenticate('jwt', { session: false }), async (req, res) => {
     await ctf.emitBefore('modifyTeam', req)
     req.params.team = parseInt(req.params.team)

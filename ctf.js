@@ -104,13 +104,15 @@ module.exports = class CTF {
   }
 
   async competitionStarted (req, res, next) {
-    if (req.competition) {
-      var competition = await Competition.findOne({ id: req.competition })
-      if (+new Date(competition.start) > +new Date()) res.status(403).json({message: 'competition_not_started'})
-      else next()
-    } else {
-      res.status(403).json({message: 'competition_not_started'})
-    }
+    passport.authenticate('jwt', { session: false }, async function (err, user) {
+      if (req.competition) {
+        var competition = await Competition.findOne({ id: req.competition })
+        if (+new Date(competition.start) > +new Date() && (!user || user.admin !== true)) res.status(403).json({message: 'competition_not_started'})
+        else next()
+      } else {
+        res.status(403).json({message: 'competition_not_started'})
+      }
+    })(req, res, next)
   }
 
   async _assignCompetition (req, res, next) {

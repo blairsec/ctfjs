@@ -11,6 +11,7 @@ module.exports = function (ctf) {
   // get a list of challenges
   router.get('/', ctf.competitionStarted, async (req, res, next) => {
     passport.authenticate('jwt', { session: false }, async function (err, user) {
+      req.user = user
       if (err) throw err
       var options = {}
       if (user && user.admin === true) {
@@ -26,6 +27,7 @@ module.exports = function (ctf) {
 
   router.get('/:id', ctf.competitionStarted, async (req, res, next) => {
     passport.authenticate('jwt', { session: false }, async function (err, user) {
+      req.user = user
       if (err) throw err
       var options = {}
       if (user && user.admin === true) {

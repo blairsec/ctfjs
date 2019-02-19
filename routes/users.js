@@ -8,7 +8,7 @@ module.exports = function (ctf) {
 
   // register a user
   router.post('/', [
-    body('username').isString().trim().isLength({ min: 1 }),
+    body('username').isString().trim().isLength({ min: 1, max: 50 }).matches(/^[A-Za-z0-9_]+$/),
     body('password').isString().isLength({ min: 8 }),
     body('email').isString().trim().matches(/^\S+@\S+\.\S+$/),
     body('eligible').isBoolean()
@@ -28,7 +28,7 @@ module.exports = function (ctf) {
         password: req.body.password
       })
       await user.save()
-      await ctf.emitAfter('creatUser', req, { user: user })
+      await ctf.emitAfter('createUser', req, { user: user })
       res.sendStatus(201)
     } catch (error) {
       res.status(409).json({message: 'username_email_conflict'})
@@ -63,7 +63,7 @@ module.exports = function (ctf) {
 
   // modify a user
   router.patch('/:user', [
-    body('username').isString().trim().isLength({ min: 1 }).optional(),
+    body('username').isString().trim().isLength({ min: 1, max: 50 }).matches(/^[A-Za-z0-9_]+$/).optional(),
     body('email').isString().trim().matches(/^\S+@\S+\.\S+$/).optional(),
     body('eligible').isBoolean().optional()
   ], passport.authenticate('jwt', { session: false }), async (req, res) => {

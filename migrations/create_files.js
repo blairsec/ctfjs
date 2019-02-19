@@ -2,8 +2,9 @@
 exports.up = function (knex) {
   return knex.schema.createTable('files', t => {
     t.increments('id').unsigned().primary()
-    t.text('source')
-    t.text('destination')
+    t.text('path')
+    t.integer('challenge').unsigned()
+    t.foreign('challenge').references('challenges.id').onDelete('SET NULL')
   })
 }
 
