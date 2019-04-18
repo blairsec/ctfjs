@@ -65,7 +65,7 @@ module.exports = class CTF {
     var router = express.Router()
 
     var corsMiddleware
-    if (config.cors_origin) corsMiddleware = cors({ origin: config.cors_origin, allowedHeaders: ['Authorization', 'Content-Type'] })
+    if (config.cors_origin) corsMiddleware = cors({ origin: config.cors_origin, allowedHeaders: ['Authorization', 'Content-Type', 'captcha'] })
 
     if (corsMiddleware) {
       router.use(corsMiddleware)
