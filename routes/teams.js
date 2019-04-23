@@ -1,5 +1,6 @@
 module.exports = function (ctf) {
   var express = require('express')
+  var cache = require('express-redis-cache')()
   var passport = require('passport')
   var User = require('../models/user')
   var Team = require('../models/team')
@@ -49,7 +50,7 @@ module.exports = function (ctf) {
   })
 
   // get list of teams
-  router.get('/', async (req, res) => {
+  router.get('/', cache.route({ expire: 60 }), async (req, res) => {
     await ctf.emitBefore('getTeams', req)
     var team = await Team.findSerialized({competition: req.competition})
     await ctf.emitAfter('getTeams', req)
