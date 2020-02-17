@@ -16,6 +16,7 @@ before(async function () {
   process.env.PORT = 9225
   process.env.DATABASE_URI = 'postgresql://ctf@localhost/ctfjstesting'
   process.env.SECRET_KEY = 'secret_for_testing_only'
+  process.env.DISABLE_CACHE = '1'
 
   await require('../db').init(process.env.DATABASE_URI)
   app = require('../index.js')

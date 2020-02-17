@@ -72,6 +72,8 @@ module.exports = class CTF {
       router.options(corsMiddleware)
     }
 
+    if (config.disable_cache) this.disableCache = true
+
     var usersRouter = require('./routes/users')(this)
     var authRouter = require('./routes/auth')(this)
     var teamsRouter = require('./routes/teams')(this)

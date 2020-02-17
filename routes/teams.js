@@ -52,8 +52,8 @@ module.exports = function (ctf) {
   // get list of teams
   router.get('/', async (req, res) => {
     await ctf.emitBefore('getTeams', req)
-    var cacheKey = 'teams_'+req.competition+(req.query.frozen !== undefined ? '_frozen' : '')
-    if (!teamCache[cacheKey] || +new Date() - teamCache[cacheKey].timestamp > 30000) {
+    var cacheKey = 'teams_' + req.competition + (req.query.frozen !== undefined ? '_frozen' : '')
+    if (ctf.disableCache || !teamCache[cacheKey] || +new Date() - teamCache[cacheKey].timestamp > 30000) {
       var teams = await Team.findSerialized({competition: req.competition}, {frozen: req.query.frozen !== undefined})
       teamCache[cacheKey] = {}
       teamCache[cacheKey].teams = teams
