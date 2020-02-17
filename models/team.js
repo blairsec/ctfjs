@@ -31,7 +31,7 @@ class Team extends Model {
     ])
   }
 
-  static async findSerialized (properties) {
+  static async findSerialized (properties, options) {
     // specify table name in properties
     for (var prop in properties) {
       properties['teams.' + prop] = properties[prop]
@@ -39,7 +39,7 @@ class Team extends Model {
     }
 
     var teams = db.select('teams.id', 'teams.name', 'affiliation', 'teams.created', db.raw('bool_and(users.eligible) as eligible'), db.raw('sum(challenges.value) / count(DISTINCT users.id) as score')).max('submissions.created as lastSolve').from('teams').where(properties).leftJoin('submissions', 'teams.id', 'submissions.team').leftJoin('competitions', 'competitions.id', 'teams.competition').leftJoin('challenges', function () {
-      this.on('submissions.challenge', 'challenges.id').andOn('submissions.content', 'challenges.flag').andOn('submissions.created', '<', 'competitions.end')
+      (options && options.frozen) ? this.on('submissions.challenge', 'challenges.id').andOn('submissions.content', 'challenges.flag').andOn('submissions.created', '<', 'competitions.end') : this.on('submissions.challenge', 'challenges.id').andOn('submissions.content', 'challenges.flag')
     }).leftJoin('users', 'users.team', 'teams.id').groupBy('teams.id')
     teams = await teams
 

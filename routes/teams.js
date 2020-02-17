@@ -1,11 +1,11 @@
 module.exports = function (ctf) {
   var express = require('express')
-  var cache = require('express-redis-cache')()
   var passport = require('passport')
   var User = require('../models/user')
   var Team = require('../models/team')
   var Competition = require('../models/competition')
   var router = express.Router()
+  var teamCache = {}
 
   var { body, validationResult } = require('express-validator/check')
 
@@ -50,11 +50,17 @@ module.exports = function (ctf) {
   })
 
   // get list of teams
-  router.get('/', cache.route({ expire: 60 }), async (req, res) => {
+  router.get('/', async (req, res) => {
     await ctf.emitBefore('getTeams', req)
-    var team = await Team.findSerialized({competition: req.competition})
+    var cacheKey = 'teams_'+req.competition+(req.query.frozen !== undefined ? '_frozen' : '')
+    if (!teamCache[cacheKey] || +new Date() - teamCache[cacheKey].timestamp > 30000) {
+      var teams = await Team.findSerialized({competition: req.competition}, {frozen: req.query.frozen !== undefined})
+      teamCache[cacheKey] = {}
+      teamCache[cacheKey].teams = teams
+      teamCache[cacheKey].timestamp = +new Date()
+    }
     await ctf.emitAfter('getTeams', req)
-    res.json(team)
+    res.json(teamCache[cacheKey].teams)
   })
 
   // get a team

@@ -34,6 +34,9 @@ Gets a list of teams.
 ## Get a team
 Gets a single team.
 ### `GET /competitions/{id}/teams/{id}`
+
+To retrieve scores as they were at the end of the competition, set the query parameter `frozen`.
+
 ### Responses
 
 |code|description|content|
