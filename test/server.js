@@ -1461,8 +1461,12 @@ describe("Server Tests", function () {
                         flag: "test flag 2",
                     })
                     .expect(200)
-                    .expect({correct: true})
-                    .then(function () {
+                    .expect({correct: true}, done);
+            });
+            it("200 | no duplicate solves", function (done) {
+                const requests = [];
+                for (let i = 0; i < 10; i++) {
+                    requests.push(
                         request(app)
                             .post("/competitions/2/challenges/2/submissions")
                             .set("referer", "https://angstromctf.com")
@@ -1472,9 +1476,29 @@ describe("Server Tests", function () {
                                 _csrf: "abc",
                                 flag: "test flag",
                             })
-                            .expect(200)
-                            .expect({correct: true}, done);
-                    });
+                    );
+                }
+                Promise.all(requests).then((responses) => {
+                    let foundSuccess = false;
+                    for (const res of responses) {
+                        if (res.statusCode == 200) {
+                            assert.deepStrictEqual(res.body, {correct: true});
+                            if (foundSuccess) {
+                                return done("Duplicate solve found.");
+                            }
+                            foundSuccess = true;
+                        } else {
+                            assert.strictEqual(res.statusCode, 400);
+                            assert.deepStrictEqual(res.body, {
+                                message: "challenge_already_solved",
+                            });
+                        }
+                    }
+                    if (!foundSuccess) {
+                        return done("No solve found when there should be 1.");
+                    }
+                    done();
+                });
             });
             it("404 | returns not found if challenge doesn't exist", function (done) {
                 request(app)
