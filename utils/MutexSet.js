@@ -36,8 +36,16 @@ class MutexSet {
 
     async run(id, f) {
         await this.lock(id);
-        await f();
+        let ret;
+        try {
+            ret = await f();
+        } catch (err) {
+            // unlock then rethrow error
+            await this.unlock(id);
+            throw err;
+        }
         await this.unlock(id);
+        return ret;
     }
 }
 

@@ -4,9 +4,12 @@ module.exports = function (ctf) {
     const Team = require("../models/team");
     const Challenge = require("../models/challenge");
     const Submission = require("../models/submission");
+    const MutexSet = require("../utils/MutexSet");
     const router = express.Router();
 
     const {body, validationResult} = require("express-validator");
+
+    const ms = new MutexSet();
 
     // get a list of challenges
     router.get("/", ctf.competitionStarted, async (req, res, next) => {
@@ -130,36 +133,38 @@ module.exports = function (ctf) {
                     if (!challenge) {
                         throw challegeNotFoundError;
                     }
-                    const team = await Team.findOneSerialized({
-                        competition: req.competition,
-                        id: req.user.team,
-                    });
-                    if (
-                        team.solves
-                            .map((solve) => solve.challenge.id)
-                            .indexOf(challenge.id) === -1
-                    ) {
-                        const submission = new Submission({
-                            team: team.id,
-                            user: req.user.id,
-                            challenge: challenge.id,
-                            content: req.body.flag,
+                    await ms.run(req.user.team, async() => {
+                        const team = await Team.findOneSerialized({
                             competition: req.competition,
+                            id: req.user.team,
                         });
-                        await submission.save();
-                        await ctf.emitAfter("submitFlag", req, {
-                            challenge: challenge,
-                            team: team,
-                            submission: submission,
-                        });
-                        res.json({
-                            correct: submission.content === challenge.flag,
-                        });
-                    } else {
-                        res.status(400).json({
-                            message: "challenge_already_solved",
-                        });
-                    }
+                        if (
+                            team.solves
+                                .map((solve) => solve.challenge.id)
+                                .indexOf(challenge.id) === -1
+                        ) {
+                            const submission = new Submission({
+                                team: team.id,
+                                user: req.user.id,
+                                challenge: challenge.id,
+                                content: req.body.flag,
+                                competition: req.competition,
+                            });
+                            await submission.save();
+                            await ctf.emitAfter("submitFlag", req, {
+                                challenge: challenge,
+                                team: team,
+                                submission: submission,
+                            });
+                            res.json({
+                                correct: submission.content === challenge.flag,
+                            });
+                        } else {
+                            res.status(400).json({
+                                message: "challenge_already_solved",
+                            });
+                        }
+                    });
                 } catch (err) {
                     res.status(404).json({message: "challenge_not_found"});
                 }
