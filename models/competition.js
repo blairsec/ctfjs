@@ -1,31 +1,35 @@
-var Model = require('./model')
+const Model = require("./model");
 
 class Competition extends Model {
-  static get tableName () {
-    return 'competitions'
-  }
+    static get tableName() {
+        return "competitions";
+    }
 
-  static get properties () {
-    return super.properties.concat([
-      {
-        name: 'name',
-        valid: name => typeof name === 'string',
-        required: true
-      }, {
-        name: 'about',
-        valid: about => typeof about === 'string'
-      }, {
-        name: 'start',
-        valid: start => start instanceof Date
-      }, {
-        name: 'end',
-        valid: end => end instanceof Date
-      }, {
-        name: 'teamSize',
-        valid: teamSize => typeof teamSize === 'number'
-      }
-    ])
-  }
+    static get properties() {
+        return super.properties.concat([
+            {
+                name: "name",
+                valid: (name) => typeof name === "string",
+                required: true,
+            },
+            {
+                name: "about",
+                valid: (about) => typeof about === "string",
+            },
+            {
+                name: "start",
+                valid: (start) => start instanceof Date,
+            },
+            {
+                name: "end",
+                valid: (end) => end instanceof Date,
+            },
+            {
+                name: "teamSize",
+                valid: (teamSize) => typeof teamSize === "number",
+            },
+        ]);
+    }
 }
 
-module.exports = Competition
+module.exports = Competition;

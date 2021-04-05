@@ -1,7 +1,7 @@
 language: node_js
 node_js: "node"
 services:
-  - postgresql
+    - postgresql
 before_script:
-  - psql -c 'CREATE USER ctf WITH SUPERUSER;' -U postgres
+    - psql -c 'CREATE USER ctf WITH SUPERUSER;' -U postgres
 after_success: npm run coverage

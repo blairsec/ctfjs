@@ -16,12 +16,12 @@ Creates an admin user. Can only be done by an admin or if no admins have been cr
 
 ### Responses
 
-| code | description                | content                                |
-| ---- | -------------------------- | -------------------------------------- |
-| 201  | successfully created admin | none                                   |
+| code | description                | content                                  |
+| ---- | -------------------------- | ---------------------------------------- |
+| 201  | successfully created admin | none                                     |
 | 409  | username or email conflict | `{"message": "username_email_conflict"}` |
-| 403  | action forbidden           | `{"message": "action_forbidden"}`          |
-| 400 | invalid values | `{"message": "invalid_values"}` |
+| 403  | action forbidden           | `{"message": "action_forbidden"}`        |
+| 400  | invalid values             | `{"message": "invalid_values"}`          |
 
 ## Get a list of admins
 
@@ -31,8 +31,8 @@ Gets a list of all admins.
 
 ### Responses
 
-| code | description         | content                             |
-| ---- | ------------------- | ----------------------------------- |
+| code | description         | content                                          |
+| ---- | ------------------- | ------------------------------------------------ |
 | 200  | list of admin users | list of [users](index.md#user-list) without team |
 
 ## Give authentication token
@@ -63,7 +63,7 @@ Delete an admin. Requires admin.
 
 ### Responses
 
-| code | description           | content                           |
-| ---- | --------------------- | --------------------------------- |
-| 204  | successfully deleted  | none                              |
-| 403  | action forbidden      | `{"message": "action_forbidden"}` |
+| code | description          | content                           |
+| ---- | -------------------- | --------------------------------- |
+| 204  | successfully deleted | none                              |
+| 403  | action forbidden     | `{"message": "action_forbidden"}` |

@@ -1,5 +1,3 @@
 module.exports = {
-
-  client: 'postgresql'
-
-}
+    client: "postgresql",
+};

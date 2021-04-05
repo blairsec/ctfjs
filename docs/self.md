@@ -8,8 +8,7 @@ If authenticated, get information about the current user, team, and competition.
 
 ### Responses
 
-| code | description                                                  | content                                                      |
-| ---- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| code | description                                                                                 | content                                                        |
+| ---- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | 200  | current [user](index.md#user) (with team and email) and [competition](index.md#competition) | `{"user": <user object>, "competition": <competition object>}` |
-| 401  | not authenticated                                            | none                                                         |
-
+| 401  | not authenticated                                                                           | none                                                           |

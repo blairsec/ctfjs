@@ -1,3 +1,19 @@
 {
-    "extends": "standard"
+    "extends": "eslint:recommended",
+    "rules": {
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["error", "double"],
+        "semi": ["error", "always"],
+        "no-var": ["error"],
+        "no-unused-vars": ["error", {"args": "none"}],
+        "prefer-const": ["warn", {"destructuring": "all"}],
+        "curly": ["error", "all"]
+    },
+    "parserOptions": {
+        "ecmaVersion": 9
+    },
+    "env": {
+        "es6": true,
+        "node": true
+    }
 }
