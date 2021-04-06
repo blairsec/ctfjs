@@ -69,7 +69,7 @@ class Team extends Model {
             })
             .leftJoin("submissions as nonSurvey", function () {
                 this.on("submissions.id", "nonSurvey.id")
-                    .andOn("nonSurvey.challenge", "<>", db.raw("223"))
+                    .andOn("nonSurvey.challenge", "<>", db.raw("223"));
             })
             .leftJoin("users", "users.team", "teams.id")
             .groupBy("teams.id");
