@@ -52,7 +52,7 @@ class Team extends Model {
                     "sum(challenges.value) / count(DISTINCT users.id) as score"
                 )
             )
-            .max("submissions.created as lastSolve")
+            .max("nonSurvey.created as lastSolve")
             .from("teams")
             .where(properties)
             .leftJoin("submissions", "teams.id", "submissions.team")
@@ -66,6 +66,10 @@ class Team extends Model {
                           "submissions.content",
                           "challenges.flag"
                       );
+            })
+            .leftJoin("submissions as nonSurvey", function () {
+                this.on("submissions.id", "nonSurvey.id")
+                    .andOn("nonSurvey.challenge", "<>", db.raw("223"))
             })
             .leftJoin("users", "users.team", "teams.id")
             .groupBy("teams.id");
