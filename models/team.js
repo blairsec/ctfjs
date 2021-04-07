@@ -57,7 +57,7 @@ class Team extends Model {
             .where(properties)
             .leftJoin("submissions", "teams.id", "submissions.team")
             .leftJoin("competitions", "competitions.id", "teams.competition")
-            .innerJoin("challenges", function () {
+            .leftJoin("challenges", function () {
                 options && options.frozen
                     ? this.on("submissions.challenge", "challenges.id")
                           .andOn("submissions.content", "challenges.flag")
@@ -69,7 +69,8 @@ class Team extends Model {
             })
             .leftJoin("submissions as nonSurvey", function () {
                 this.on("submissions.id", "nonSurvey.id")
-                    .andOn("nonSurvey.challenge", "<>", db.raw("223"));
+                    .andOn("nonSurvey.challenge", "<>", db.raw("223"))
+                    .andOn("nonSurvey.challenge, "challenge.id");
             })
             .leftJoin("users", "users.team", "teams.id")
             .groupBy("teams.id");
