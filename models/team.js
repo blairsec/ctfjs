@@ -57,7 +57,7 @@ class Team extends Model {
             .where(properties)
             .leftJoin("submissions", "teams.id", "submissions.team")
             .leftJoin("competitions", "competitions.id", "teams.competition")
-            .rightJoin("challenges", function () {
+            .innerJoin("challenges", function () {
                 options && options.frozen
                     ? this.on("submissions.challenge", "challenges.id")
                           .andOn("submissions.content", "challenges.flag")
